@@ -11187,13 +11187,15 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
                     for key, name, _volume in gamuts:
                         try:
                             gamut_coverage = float(
-                                profile.tags.meta.getvalue("GAMUT_coverage(%s)" % key)
+                                profile.tags.meta.getvalue(f"GAMUT_coverage({key})")
                             )
                         except (TypeError, ValueError):
                             traceback.print_exc()
                             gamut_coverage = None
                         if gamut_coverage:
-                            cinfo.append("%.1f%% %s" % (gamut_coverage * 100, name))
+                            cinfo.append(
+                                "{:.1f}% {}".format(gamut_coverage * 100, name)
+                            )
                     try:
                         gamut_volume = float(profile.tags.meta.getvalue("GAMUT_volume"))
                     except (TypeError, ValueError):
@@ -11202,12 +11204,8 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
                     if gamut_volume:
                         for _key, name, volume in gamuts:
                             vinfo.append(
-                                "%.1f%% %s"
-                                % (
-                                    gamut_volume
-                                    * ICCP.GAMUT_VOLUME_SRGB
-                                    / volume
-                                    * 100,
+                                "{:.1f}% {}".format(
+                                    gamut_volume * ICCP.GAMUT_VOLUME_SRGB / volume * 100,
                                     name,
                                 )
                             )
