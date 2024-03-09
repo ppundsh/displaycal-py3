@@ -1,8 +1,6 @@
 """Sample DisplayData class."""
 from typing import Dict, List
 
-from wx import Rect
-
 
 class DisplayData:
     """Sample Display."""
@@ -287,8 +285,9 @@ class DisplayData:
     ]
 
     @property
-    def Geometry(self) -> Rect:
+    def Geometry(self):
         """Return a wx Rect as display geometry."""
+        from wx import Rect
         return Rect(
             self.DISPLAY_DATA_1["pos"][0],
             self.DISPLAY_DATA_1["pos"][1],
