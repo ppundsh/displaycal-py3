@@ -3,21 +3,22 @@ NUM_CPUS = $(shell nproc ||  grep -c '^processor' /proc/cpuinfo)
 SETUP_PY_FLAGS = --use-distutils
 VERSION := $(shell cat VERSION_BASE)
 VERSION_FILE=$(CURDIR)/VERSION_BASE
+VIRTUALENV_DIR:=.venv
 
 all: build FORCE
 
 venv:
-	python3 -m venv .venv; \
-	source ./.venv/bin/activate; \
+	python3 -m venv $(VIRTUALENV_DIR); \
+	source ./$(VIRTUALENV_DIR)/bin/activate; \
 	pip install -r requirements.txt; \
 	pip install -r requirements-dev.txt;
 
 build: venv FORCE
-	source ./.venv/bin/activate; \
+	source ./$(VIRTUALENV_DIR)/bin/activate; \
 	python3 -m build;
 
 install:
-	source ./.venv/bin/activate; \
+	source ./$(VIRTUALENV_DIR)/bin/activate; \
 	pip install ./dist/DisplayCAL-$(VERSION)-*.whl;
 
 launch:
@@ -39,6 +40,7 @@ clean-all: clean
 	-rm VERSION
 	-rm -Rf DisplayCAL.egg-info
 	-rm DisplayCAL/__version__.py
+	-rm -Rf $(VIRTUALENV_DIR)
 
 html:
 	./setup.py readme
@@ -57,6 +59,10 @@ new-release:
 	twine check dist/DisplayCAL-$(VERSION).tar.gz
 # 	twine upload dist/DisplayCAL-$(VERSION).whl
 	twine upload dist/DisplayCAL-$(VERSION).tar.gz
+
+tests: venv build install
+	source $(VIRTUALENV_DIR)/bin/activate; \
+	pytest -v -n auto -W ignore --color=yes --cov-report term;
 
 # https://www.gnu.org/software/make/manual/html_node/Force-Targets.html
 FORCE:

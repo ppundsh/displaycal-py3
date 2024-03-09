@@ -30,10 +30,11 @@ if wx.VERSION < wx_minversion:
     app = wx.GetApp() or wx.App(0)
     result = wx.MessageBox(
         "This application requires a version of wxPython "
-        "greater than or equal to %s, but your most recent "
-        "version is %s.\n\n"
-        "Would you like to download a new version of wxPython?\n"
-        % (".".join(str(n) for n in wx_minversion), wx.__version__),
+        "greater than or equal to {}, but your most recent "
+        "version is {}.\n\n"
+        "Would you like to download a new version of wxPython?\n".format(
+            ".".join(str(n) for n in wx_minversion), wx.__version__
+        ),
         "wxPython Upgrade Needed",
         style=wx.YES_NO,
     )
