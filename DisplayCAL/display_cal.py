@@ -1820,6 +1820,7 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
         # Check for required resource files and get pre-canned testcharts
         self.dist_testcharts = []
         self.dist_testchart_names = []
+        self.menubar = None
         missing = []
         for filename in resfiles:
             path, ext = (
@@ -2675,7 +2676,7 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
             res.LoadFromBuffer(xrc_xml)
             self.menubar = PopupMenu(self.header)
             for label in ("file", "options", "tools", "language", "help"):
-                menu_label = "menu." + label
+                menu_label = f"menu.{label}"
                 if label == "help":
                     menu_name = "wxID_HELP"
                 else:
@@ -2685,7 +2686,13 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
             self.header.Bind(wx.EVT_RIGHT_UP, lambda e: self.menubar.popup())
         else:
             res = xrc.XmlResource(menu_xrc_path)
-            self.menubar = res.LoadMenuBar("menu")
+            self.menubar = res.LoadMenuBar(self, "menu")
+            if sys.platform == "darwin":
+                # https://github.com/eoyilmaz/displaycal-py3/issues/303
+                # set the menubar as the common menu bar,
+                # otherwise it will be hidden when the measurement window is
+                # shown
+                wx.MenuBar.MacSetCommonMenuBar(self.menubar)
 
         file_ = self.menubar.GetMenu(self.menubar.FindMenu("menu.file"))
         menuitem = file_.FindItemById(file_.FindItem("calibration.load"))
@@ -11506,9 +11513,10 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
                     ok=lang.getstr("ok"),
                     bitmap=geticon(32, "dialog-error"),
                 )
+
             if sys.platform == "darwin":
                 # For some reason, the call to enable_menus() in Show()
-                # sometimes isn't enough under Mac OS X (e.g. after calibrate &
+                # sometimes isn't enough under MacOS (e.g. after calibrate &
                 # profile)
                 self.enable_menus()
             self.start_timers(True)
