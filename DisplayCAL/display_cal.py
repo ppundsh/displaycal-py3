@@ -19684,10 +19684,10 @@ class MeasurementFileCheckSanityDialog(ConfirmDialog):
         dlg.sizer4 = wx.BoxSizer(wx.HORIZONTAL)
         dlg.sizer3.Add(dlg.sizer4)
         dlg.message_col1 = wx.StaticText(dlg, -1, msg_col1)
-        dlg.message_col1.Wrap(450 * scale)
+        dlg.message_col1.Wrap(int(450 * scale))
         dlg.sizer4.Add(dlg.message_col1, flag=wx.RIGHT, border=20)
         dlg.message_col2 = wx.StaticText(dlg, -1, msg_col2)
-        dlg.message_col2.Wrap(450 * scale)
+        dlg.message_col2.Wrap(int(450 * scale))
         dlg.sizer4.Add(dlg.message_col2, flag=wx.LEFT, border=20)
 
         dlg.Unbind(wx.EVT_BUTTON, dlg.alt)

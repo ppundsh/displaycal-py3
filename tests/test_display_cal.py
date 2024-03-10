@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import os
+import platform
+import sys
 from pathlib import Path
 from typing import Tuple
 
@@ -29,6 +32,7 @@ from DisplayCAL.display_cal import (
     MeasurementFileCheckSanityDialog,
 )
 from DisplayCAL.util_str import universal_newlines
+from DisplayCAL.util_list import intlist
 from DisplayCAL.worker import Worker, check_ti3
 from DisplayCAL.wxwindows import ConfirmDialog, BaseInteractiveDialog
 
@@ -212,7 +216,11 @@ def test_init_gamap_frame(mainframe: MainFrame) -> None:
 
 def test_init_startup_frame() -> None:
     """Test if StartupFrame is initialized properly."""
-    with check_call(StartupFrame, "Show"):
+    show_func_name = "Show"
+    if (sys.platform == "darwin" and intlist(platform.mac_ver()[0].split(".")) >= [10, 10]) or os.getenv("XDG_SESSION_TYPE") == "wayland":
+        show_func_name = "ShowModal"
+
+    with check_call(StartupFrame, show_func_name):
         StartupFrame()
 
 
