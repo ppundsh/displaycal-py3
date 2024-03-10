@@ -1719,7 +1719,6 @@ class DummyDialog(object):
 
 
 class FilteredStream:
-
     """Wrap a stream and filter all lines written to it."""
 
     # Discard the whole line if it is empty after replacing patterns
@@ -5896,26 +5895,31 @@ END_DATA
         Return value is either True (succeed), False (failed), None (canceled)
         or an exception.
 
-        cmd is the full path of the command.
-        args are the arguments, if any.
-        capture_output (if True) swallows any output from the command and
-        sets the 'output' and 'errors' properties of the Worker instance.
-        display_output shows the log after the command.
-        low_contrast (if True) sets low contrast shell colors while the
-        command is run.
-        skip_scripts (if True) skips the creation of shell scripts that allow
-        re-running the command. Note that this is also controlled by a global
-        config option and scripts will only be created if it evaluates to False.
-        silent (if True) skips most output and also most error dialogs
-        (except unexpected failures)
-        parent sets the parent window for auth dialog (if asroot is True).
-        asroot (if True) on Linux runs the command using sudo.
-        log_output (if True) logs any output if capture_output is also set.
-        title = Title for auth dialog (if asroot is True)
-        working_dir = Working directory. If None, will be determined from
-        absulte path of last argument and last argument will be set to only
-        the basename. If False, no working dir will be used and file arguments
-        not changed.
+        Args:
+            cmd (str): the full path of the command.
+            args (List[str]): The arguments, if any.
+            capture_output (bool): If True, swallows any output from the
+                command and sets the 'output' and 'errors' properties of the
+                Worker instance.
+            display_output (bool): Shows the log after the command.
+            low_contrast (bool): If True sets low contrast shell colors while
+                the command is run.
+            skip_scripts (bool): If True, skips the creation of shell scripts
+                that allow re-running the command. Note that this is also
+                controlled by a global config option and scripts will only be
+                created if it evaluates to False.
+            silent (bool): If True, skips most output and also most error
+                dialogs (except unexpected failures).
+            parent (): Sets the parent window for auth dialog (if asroot is
+                True).
+            asroot (bool): If True, on Linux runs the command using sudo.
+            log_output (bool): If True, logs any output if capture_output is
+                also set.
+            title (str): Title for auth dialog (if asroot is True).
+            working_dir (str): Working directory. If None, will be determined
+                from absulte path of last argument and last argument will be
+                set to only the basename. If False, no working dir will be used
+                and file arguments not changed.
         """
         if args is None:
             args = []
@@ -7275,25 +7279,25 @@ while 1:
                         stderr.close()
                     if len(errors):
                         for line in errors:
+                            if isinstance(line, bytes):
+                                line = line.decode()
+                            line = line.strip()
                             if (
-                                b"Instrument Access Failed" in line
+                                "Instrument Access Failed" in line
                                 and "-N" in cmdline[:-1]
                             ):
                                 cmdline.remove("-N")
                                 tries = 1
                                 break
                             if (
-                                line.strip()
-                                and line.find(b"User Aborted") < 0
+                                line.find("User Aborted") < 0
                                 and line.find(
-                                    b"XRandR 1.2 is faulty - falling back "
-                                    b"to older extensions"
+                                    "XRandR 1.2 is faulty - falling back "
+                                    "to older extensions"
                                 )
                                 < 0
                             ):
-                                self.errors.append(
-                                    line.decode(data_encoding, "replace")
-                                )
+                                self.errors.append(line)
                     if tries > 0 and not use_pty:
                         stderr = tempfile.SpooledTemporaryFile()
                 if capture_output or use_pty:
@@ -7303,8 +7307,9 @@ while 1:
                     for line in stdout_readlines:
                         if isinstance(line, bytes):
                             line = line.decode()
-                        self.output.append(re.sub(r"^\.{4,}\s*$", "", line))
-                    # self.output = [re.sub(r"^\.{4,}\s*$", "", line) for line in stdout_readlines]
+                        line = line.strip()
+                        line = re.sub(r"^\.{4,}\s*$", "", line).strip()
+                        self.output.append(line)
                     stdout.close()
                     if len(self.output) and log_output:
                         if not use_pty:
