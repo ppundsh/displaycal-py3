@@ -13431,7 +13431,7 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
             else:
                 description = "%s (%s %s) & %s" % (
                     instrument or self.worker.get_instrument_name(),
-                    lang.getstr("observer." + observer),
+                    lang.getstr(f"observer.{observer}"),
                     lang.getstr("observer"),
                     manufacturer_display or self.worker.get_display_name(True, True),
                 )
@@ -13774,7 +13774,7 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
                 cgats = re.sub(
                     rb'(\nDISPLAY\s+"[^"]*"\n)',
                     b'\nREFERENCE "%s"\\1'
-                    % reference_ti3[0].get("TARGET_INSTRUMENT").replace(r"\\", r"\\\\"),
+                    % reference_ti3[0].get("TARGET_INSTRUMENT").replace(b"\\", b"\\\\"),
                     cgats,
                 )
             if not re.search(rb'\nTECHNOLOGY\s+".+?"\n', cgats) and tech:
