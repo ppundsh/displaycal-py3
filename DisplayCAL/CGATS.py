@@ -610,7 +610,6 @@ class CGATS(dict):
             for key in iterable:
                 value = self[key]
                 if isinstance(value, str):
-                    print("value could not be a str: {}".format(value))
                     value = value.encode("utf-8")
 
                 if key == "DATA":

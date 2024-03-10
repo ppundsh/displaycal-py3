@@ -7395,7 +7395,6 @@ class TaskBarNotification(wx.Frame):
 
 
 class TooltipWindow(InvincibleFrame):
-
     """A tooltip-style window"""
 
     def __init__(
@@ -7465,7 +7464,10 @@ class TooltipWindow(InvincibleFrame):
                 cls = BetterStaticFancyText
             else:
                 cls = wx.StaticText
-            col = cls(self.panel, -1, "")
+            # We need to initialize the label with something,
+            # so initialize it with with "dummy text",
+            # and it will be replaced later on...
+            col = cls(self.panel, -1, "dummy text")
             if isinstance(col, wx.Panel):
                 col.BackgroundColour = self.panel.BackgroundColour
             if "<" in label and wrap:
