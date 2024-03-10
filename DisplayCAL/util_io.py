@@ -147,7 +147,7 @@ class LineBufferedStream(object):
         file_encoding=None,
         errors="replace",
         linesep_in="\r\n",
-        linesep_out="\n",
+        linesep_out="",
     ):
         self.buf = ""
         self.data_encoding = data_encoding
@@ -182,7 +182,7 @@ class LineBufferedStream(object):
         data = data.replace(self.linesep_in, "\n")
         for char in data:
             if char == "\r":
-                while self.buf and not self.buf.endswith(self.linesep_out):
+                while self.buf and not self.buf.endswith("\n"):
                     self.buf = self.buf[:-1]
             else:
                 if char == "\n":

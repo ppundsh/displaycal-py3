@@ -91,6 +91,8 @@ data_dirs = [
     os.path.join(os.path.dirname(os.path.dirname(pypath)), "share", "DisplayCAL"),
     # venv/lib/python3.x/site-packages/DisplayCAL
     pydir,
+    # venv/share
+    os.path.join(os.path.dirname(pydir), "share"),
     # venv/lib/python3.x/site-packages/DisplayCAL-*.egg/share/DisplayCAL
     os.path.join(os.path.dirname(pydir), "share", "DisplayCAL"),
 ]

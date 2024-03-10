@@ -37,7 +37,7 @@ def init(set_wx_locale=False):
         handle_error(
             UserWarning(
                 "Warning: No language files found. The "
-                "following places have been searched:\n%s" % "\n".join(langdirs)
+                "following places have been searched:\n{}".format("\n".join(langdirs))
             )
         )
 
