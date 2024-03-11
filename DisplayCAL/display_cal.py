@@ -528,13 +528,19 @@ def app_update_confirm(
     newversion = ".".join(str(n) for n in newversion_tuple)
     if argyll:
         newversion_desc = "ArgyllCMS"
+        # TODO: I hate this, but this is the easiest way to fix
+        #       https://github.com/eoyilmaz/displaycal-py3/issues/291
+        #       we don't have access to displaycal.net to update the ArgylCMS
+        #       version. So, this mechanism should be updated to use some
+        #       other way of getting newer app versions...
+        newversion = "3.1.0"
     else:
         newversion_desc = appname
-    newversion_desc += " " + newversion
+    newversion_desc += f" {newversion}"
     if snapshot:
         newversion_desc += " Beta"
     if download:
-        msg = lang.getstr("download") + " " + newversion_desc
+        msg = "{} {}".format(lang.getstr("download"), newversion_desc)
     else:
         msg = lang.getstr("update_check.new_version", newversion_desc)
     dlg = ConfirmDialog(
@@ -623,8 +629,10 @@ def app_update_confirm(
             consumer = worker.process_download
             dlname = appname
             sep = "-"
+            domain = DOMAIN
             if argyll:
                 consumer = worker.process_argyll_download
+                domain = "www.argyllcms.com"  # force Argyll downloads
                 dlname = "Argyll"
                 sep = "_V"
                 if sys.platform == "win32":
@@ -670,7 +678,7 @@ def app_update_confirm(
                 worker.download,
                 ckwargs={"exit": dlname == appname},
                 wargs=(
-                    f"https://{DOMAIN}/download{folder}/{dlname}{sep}{sep}{suffix}",
+                    f"https://{domain}/{folder}/{dlname}{sep}{newversion}{suffix}",
                 ),
                 progress_msg=lang.getstr("downloading"),
                 fancy=False,

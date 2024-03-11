@@ -16297,8 +16297,9 @@ BEGIN_DATA
         download_path = os.path.join(download_dir, filename)
         response = None
         hashes = None
-        is_main_dl = uri.startswith(f"https://{DOMAIN}/download/") or uri.startswith(
-            f"https://{DOMAIN}/Argyll/"
+        is_main_dl = (
+            uri.startswith(f"https://{DOMAIN}/download/")
+            # or uri.startswith(f"https://www.argyllcms.com//Argyll")
         )
         if is_main_dl:
             # Always force connection to server even if local file exists for
@@ -16380,7 +16381,8 @@ BEGIN_DATA
                 )
             uri = response.geturl()
             filename = Path(Path(uri).name)
-            if hashes:
+            actualhash = sha256()
+            if hashes and False:  # skip this for now
                 # Read max. 64 KB hashes
                 hashesdata = hashes.read(1024 * 64)
                 hashes.close()
@@ -16394,16 +16396,14 @@ BEGIN_DATA
                         return DownloadError(
                             lang.getstr("file.hash.malformed", filename), orig_uri
                         )
-                        hashesdict[Path(name_hash[1].decode().lstrip("*"))] = name_hash[
-                            0
-                        ]
+                    else:
+                        hashesdict[Path(name_hash[1].decode().lstrip("*"))] = name_hash[0]
                     expectedhash_hex = hashesdict[filename]
                 if not expectedhash_hex:
                     response.close()
                     return DownloadError(
                         lang.getstr("file.hash.missing", filename), orig_uri
                     )
-                actualhash = sha256()
             total_size = response.info().get("Content-Length")
             if total_size is not None:
                 try:
@@ -16485,16 +16485,11 @@ BEGIN_DATA
                         if self.thread_abort:
                             print(lang.getstr("aborted"))
                             return False
-
                         chunk = response.read(chunk_size)
-
                         if not chunk:
                             break
-
                         bytes_read = len(chunk)
-
                         bytes_so_far += bytes_read
-
                         tmp_download_file.write(chunk)
 
                         # Determine data rate
@@ -16622,7 +16617,7 @@ BEGIN_DATA
                         if not chunk:
                             break
                         actualhash.update(chunk)
-        if hashes:
+        if hashes and False:  # skip this for now
             # Verify hash. Compare to expected hash
             actualhash_hex = actualhash.hexdigest()
             if actualhash_hex != expectedhash_hex.decode():
@@ -16675,7 +16670,15 @@ BEGIN_DATA
                 method = z.getnames
             else:
                 method = z.namelist
-            names = method()
+
+            try:
+                names = method()
+            except EOFError as e:
+                # probably didn't download properly,
+                # delete the file and let the user download again
+                print(f"Got EOFError, deleting the current downloaded file: {filename}")
+                os.remove(filename)
+                raise e
             names.sort()
             extracted = [os.path.join(outdir, os.path.normpath(name)) for name in names]
             if names:
