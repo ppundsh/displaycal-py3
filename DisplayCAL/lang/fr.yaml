@@ -270,7 +270,7 @@
 "audio.lib": |-
   Module audio : %s
 "auth": |-
-  Authentification
+  Authentication
 "auth.failed": |-
   Échec de l’authentification.
 "auto": |-
