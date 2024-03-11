@@ -15,7 +15,10 @@ def get_display(display_name=None):
         try:
             display_screen = tuple(int(n) for n in display_parts[1].split(b"."))
         except ValueError:
-            warnings.warn("invalid value for display name: %r" % display_name, Warning)
+            warnings.warn(
+                f"invalid value for display name: '{display_name.decode()}'",
+                Warning,
+            )
         else:
             display = display_screen[0]
             if len(display_screen) > 1:
