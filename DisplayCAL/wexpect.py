@@ -322,8 +322,8 @@ def spawn(
         for name in env:
             log("\t%s=%s" % (name, env[name]))
     if cwd:
-        log("Working directory: %s" % cwd)
-    log("Spawning %s" % join_args([command] + args))
+        log(f"Working directory: {cwd}")
+    log("Spawning {}".format(join_args([command] + args)))
     if sys.platform == "win32":
         return spawn_windows(
             command,

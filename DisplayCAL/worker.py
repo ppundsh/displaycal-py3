@@ -1998,8 +1998,9 @@ class Sudo(object):
         except Exception as exception:
             return (
                 StringWithLengthOverride(
-                    "Could not run %s %s: %s"
-                    % (self.sudo, " ".join(sudo_args), exception),
+                    "Could not run {} {}: {}".format(
+                        self.sudo, " ".join(sudo_args), exception
+                    ),
                     0,
                 ),
                 pwd,
