@@ -6584,7 +6584,9 @@ if sys.platform != "win32":
     print(*["\\nCurrent RGB"] + sys.argv[1:])
 abortfilename = os.path.join(%r, ".abort")
 okfilename = os.path.join(%r, ".ok")
-while 1:
+end_time = start_time = time.time()
+timeout_length = 5  # seconds
+while True:
     if os.path.isfile(abortfilename):
         break
     if os.path.isfile(okfilename):
@@ -6594,7 +6596,12 @@ while 1:
             pass
         else:
             break
-    time.sleep(0.001)
+    time.sleep(0.010)
+    end_time = time.time()
+    if (end_time - start_time) > timeout_length:
+        if sys.platform != "win32":
+            print("\\n\\nPANIC.... Checking Abort/OK TIMEOUT!\\n\\n")
+        break
 """ % (
                 script_dir,
                 script_dir,
@@ -6607,12 +6614,12 @@ while 1:
                     if os.path.exists(path):
                         pythonpath[i] = win32api.GetShortPathName(path)
                 # Write out .wait.py file
-                scriptfilename = waitfilename + ".py"
+                scriptfilename =  f"{waitfilename}.py"
                 with open(scriptfilename, "w") as scriptfile:
                     scriptfile.write(pythonscript)
                 scriptfilename = win32api.GetShortPathName(scriptfilename)
                 # Write out .wait.cmd file
-                with open(waitfilename + ".cmd", "w") as waitfile:
+                with open(f"{waitfilename}.cmd", "w") as waitfile:
                     waitfile.write("@echo off\n")
                     waitfile.write("echo.\n")
                     waitfile.write("echo Current RGB %*\n")
