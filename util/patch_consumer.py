@@ -47,7 +47,6 @@ class PatchConsumerDialog(QtWidgets.QDialog):
         self.resize(500, 500)
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.setAttribute(QtCore.Qt.WA_StyledBackground, True)
-        self.setStyleSheet("background-color: red;")
 
     def update_color(self, color:QtGui.QColor):
         """Update the color.
@@ -58,7 +57,13 @@ class PatchConsumerDialog(QtWidgets.QDialog):
         style_sheet = "background-color: rgb({}, {}, {});".format(
             color.red(), color.green(), color.blue()
         )
-        print(color.red(), color.green(), color.blue())
+        print(
+            "{:.04f} {:.04f} {:.04f}".format(
+                color.redF(),
+                color.greenF(),
+                color.blueF(),
+            )
+        )
         self.setStyleSheet(style_sheet)
 
     def run_client(self):
@@ -85,14 +90,10 @@ class Client(QtCore.QThread):
             print(xml_data)
             while True:
                 data_length_raw = self.conn.recv(4)
-                # print(f"data_length: {data_length_raw}")
                 data_length = struct.unpack(">I", data_length_raw)
-                # print(f"data_length: {data_length[0]}")
                 data = self.conn.recv(data_length[0])
-                # print(f"data: {data}")
                 color = self.parse_xml_data(data)
                 self.update_color.emit(color)
-                # time.sleep(0.2)
 
     def parse_xml_data(self, xml_data_raw:bytes) -> QtGui.QColor:
         """Parse the xml data and reutrn the QColor."""
@@ -102,9 +103,16 @@ class Client(QtCore.QThread):
         green = int(color.attrib["green"])
         blue = int(color.attrib["blue"])
         bit_depth = int(color.attrib["bits"])
-        return QtGui.QColor(red / 4, green / 4, blue / 4)
-
-
+        # scale the colors to 16bit
+        bit_multiplier = 2**(16 - bit_depth)
+        return QtGui.QColor(
+            QtGui.QRgba64.fromRgba64(
+                red * bit_multiplier,
+                green * bit_multiplier,
+                blue * bit_multiplier,
+                65535,  # alpha
+            )
+        )
 
     def quit(self):
         """Quit the thread."""
