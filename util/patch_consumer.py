@@ -47,6 +47,9 @@ class PatchConsumerDialog(QtWidgets.QDialog):
         self.resize(500, 500)
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.setAttribute(QtCore.Qt.WA_StyledBackground, True)
+        self.setWindowFlags(
+            self.windowFlags() | QtCore.Qt.WindowStaysOnTopHint
+        )
 
     def update_color(self, color:QtGui.QColor):
         """Update the color.
