@@ -10985,7 +10985,7 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
             except Exception as exception:
                 wx.CallAfter(show_result_dialog, exception, self)
             else:
-                if cgats.queryv1("INSTRUMENT_TYPE_SPECTRAL") == "YES":
+                if cgats.queryv1("INSTRUMENT_TYPE_SPECTRAL").decode("utf-8") == "YES":
                     setcfg("last_reference_ti3_path", cgats.filename)
                 else:
                     setcfg("last_colorimeter_ti3_path", cgats.filename)
