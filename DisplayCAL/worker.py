@@ -6584,8 +6584,8 @@ if sys.platform != "win32":
     print(*["\\nCurrent RGB"] + sys.argv[1:])
 abortfilename = os.path.join(%r, ".abort")
 okfilename = os.path.join(%r, ".ok")
-end_time = start_time = time.time()
-timeout_length = 5  # seconds
+# end_time = start_time = time.time()
+# timeout_length = 5  # seconds
 while True:
     if os.path.isfile(abortfilename):
         break
@@ -6596,12 +6596,12 @@ while True:
             pass
         else:
             break
-    time.sleep(0.010)
-    end_time = time.time()
-    if (end_time - start_time) > timeout_length:
-        if sys.platform != "win32":
-            print("\\n\\nPANIC.... Checking Abort/OK TIMEOUT!\\n\\n")
-        break
+    time.sleep(0.001)
+    # end_time = time.time()
+    # if (end_time - start_time) > timeout_length:
+    #     if sys.platform != "win32":
+    #         print("\\n\\nPANIC.... Checking Abort/OK TIMEOUT!\\n\\n")
+    #     break
 """ % (
                 script_dir,
                 script_dir,
@@ -17122,7 +17122,7 @@ BEGIN_DATA
                 self.patch_count = 0
                 self.patterngenerator_sent_count = 0
         update = re.search(
-            r"[/\\] current|patch \d+ of |the instrument can be removed from the screen",
+            r"[/\\ ]*current|patch \d+ of |the instrument can be removed from the screen",
             txt,
             re.I,
         )
