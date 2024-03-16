@@ -13515,6 +13515,10 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
                     boxsizer.Add((1, 8))
                 if not config.is_virtual_display():
                     display = self.worker.get_display_name(False, True, False)
+                # "display" is never assigned anything from line 13402 and remains a NoneType, which throws an error in the following "dlg.display_txt_ctrl"
+                # It looks like another byte vs. string issue all the way back in how the ARGYLL_COLPROF_ARGS section is written into the reference.ti3
+                # So for now, this puts the short name of virtual displays into the dialog box so the process can continue
+                else: display = self.worker.get_display_name_short()
                 dlg.display_txt_ctrl = wx.TextCtrl(dlg, -1, display, size=(400, -1))
                 boxsizer.Add(
                     dlg.display_txt_ctrl,
