@@ -413,6 +413,7 @@ class CCXXPlot(wx.Frame):
             self.Sizer.Add(bg, 1, flag=wx.EXPAND)
             bg.Sizer.Add(canvas, 1, flag=wx.EXPAND)
         else:
+            bg.MinSize = (int(400 * scale), int(400 * scale))
             self.Sizer.Add(bg, flag=wx.ALIGN_CENTER)
             canvas_w = int(240 * scale)
             canvas.MinSize = (int(canvas_w), int(canvas_w * (74.6 / 67.4)))
