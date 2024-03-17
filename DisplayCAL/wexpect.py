@@ -449,8 +449,8 @@ class spawn_unix(object):
         close() method. The exit or signal status of the child will be stored
         in self.exitstatus or self.signalstatus. If the child exited normally
         then exitstatus will store the exit return code and signalstatus will
-        be None. If the child was terminated abnormally with a signal then
-    a        signalstatus will store the signal value and exitstatus will be None.
+        be None. If the child was terminated abnormally with a signal then a
+        signalstatus will store the signal value and exitstatus will be None.
         If you need more detail you can also read the self.status member which
         stores the status returned by os.waitpid. You can interpret this using
         os.WIFEXITED/os.WEXITSTATUS or os.WIFSIGNALED/os.TERMSIG.

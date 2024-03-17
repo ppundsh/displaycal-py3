@@ -318,6 +318,25 @@ keycodes = {
 workers = []
 
 
+WAIT_FILE_TEMPLATE = """import os, sys, time
+if sys.platform != "win32":
+    print(*["\\nCurrent RGB"] + sys.argv[1:])
+abortfilename = os.path.join("{script_dir}", ".abort")
+okfilename = os.path.join("{script_dir}", ".ok")
+while True:
+    if os.path.isfile(abortfilename):
+        break
+    if os.path.isfile(okfilename):
+        try:
+            os.remove(okfilename)
+        except OSError as e:
+            pass
+        else:
+            break
+    time.sleep(0.001)
+"""
+
+
 def add_keywords_to_cgats(cgats, keywords):
     """Add keywords to CGATS"""
     if not isinstance(cgats, CGATS.CGATS):
@@ -2182,6 +2201,7 @@ class Worker(WorkerBase):
         self._patterngenerator_wait = False
 
         self.send_buffer = None
+        self.partial_data = ""
         self.owner = owner  # owner should be a wxFrame or similar
         if sys.platform == "win32":
             self.pty_encoding = "cp%i" % windll.kernel32.GetACP()
@@ -6579,33 +6599,7 @@ BEGIN_DATA
                 index = 1
             python, pythonpath = get_python_and_pythonpath()
             script_dir = working_dir
-            pythonscript = """import os, sys, time
-if sys.platform != "win32":
-    print(*["\\nCurrent RGB"] + sys.argv[1:])
-abortfilename = os.path.join(%r, ".abort")
-okfilename = os.path.join(%r, ".ok")
-# end_time = start_time = time.time()
-# timeout_length = 5  # seconds
-while True:
-    if os.path.isfile(abortfilename):
-        break
-    if os.path.isfile(okfilename):
-        try:
-            os.remove(okfilename)
-        except OSError:
-            pass
-        else:
-            break
-    time.sleep(0.001)
-    # end_time = time.time()
-    # if (end_time - start_time) > timeout_length:
-    #     if sys.platform != "win32":
-    #         print("\\n\\nPANIC.... Checking Abort/OK TIMEOUT!\\n\\n")
-    #     break
-""" % (
-                script_dir,
-                script_dir,
-            )
+            pythonscript = WAIT_FILE_TEMPLATE.format(script_dir=script_dir)
             waitfilename = os.path.join(script_dir, ".wait")
             if sys.platform == "win32":
                 # Avoid problems with encoding
@@ -6635,8 +6629,7 @@ while True:
             else:
                 # Write out .wait file
                 with open(waitfilename, "w") as waitfile:
-                    waitfile.write("#!/usr/bin/env python3\n")
-                    waitfile.write(pythonscript)
+                    waitfile.write(f"#!/usr/bin/env python3\n{pythonscript}")
                 os.chmod(waitfilename, 0o755)
                 args[index] += '%s ./%s' % (
                     strtr(safe_str(python), {'"': r"\"", "$": r"\$"}),
@@ -17122,7 +17115,7 @@ BEGIN_DATA
                 self.patch_count = 0
                 self.patterngenerator_sent_count = 0
         update = re.search(
-            r"[/\\ ]*current|patch \d+ of |the instrument can be removed from the screen",
+            r"[/\\] current|patch \d+ of |the instrument can be removed from the screen",
             txt,
             re.I,
         )
@@ -17133,8 +17126,27 @@ BEGIN_DATA
             and hasattr(self.patterngenerator, "conn")
         )
         if use_patterngenerator or self.use_madnet_tpg or self._use_patternwindow:
-            rgb = re.search(r"Current RGB(?:\s+\d+){3}((?:\s+\d+(?:\.\d+)){3})", txt)
+            # sometimes the data is not fully received
+            if self.partial_data != "":
+                # combine the partial data with the currently received one
+                self.log(f"Combining previous data of: {self.partial_data}")
+                self.log(f"with                      : {txt}")
+                txt = self.partial_data + txt
+                self.log(f"to                        : {txt}")
+
+            rgb = re.search(
+                r"Current RGB(?:\s+\d+){3}((?:\s+\d+(?:\.\d+)){3})", txt
+            )
+            # Check if the data is partial
+            if "Current RGB" in txt and rgb is None:
+                self.log(
+                    f"Data is not fully received, storing partial data: {txt}"
+                )
+                self.partial_data = txt
+
             if rgb:
+                # reset the partial data storage, as we fully received the data
+                self.partial_data = ""
                 update_ffp_insertion_ts = False
                 if (
                     getcfg("patterngenerator.ffp_insertion")
@@ -17177,8 +17189,8 @@ BEGIN_DATA
                     if self.madtpg.show_rgb(*rgb):
                         self.patterngenerator_sent_count += 1
                         self.log(
-                            "%s: MadTPG_Net sent count: %i"
-                            % (appname, self.patterngenerator_sent_count)
+                            f"{appname}: MadTPG_Net sent count: "
+                            f"{self.patterngenerator_sent_count}"
                         )
                     else:
                         self.exec_cmd_returnvalue = Error(
