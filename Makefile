@@ -7,6 +7,12 @@ VIRTUALENV_DIR:=.venv
 
 all: build FORCE
 
+.PHONY: help
+help:
+	@echo ""
+	@echo "Available targets:"
+	@make -qp | grep -o '^[a-z0-9-]\+' | sort
+
 venv:
 	python3 -m venv $(VIRTUALENV_DIR); \
 	source ./$(VIRTUALENV_DIR)/bin/activate; \

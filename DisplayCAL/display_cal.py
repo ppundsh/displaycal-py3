@@ -528,13 +528,19 @@ def app_update_confirm(
     newversion = ".".join(str(n) for n in newversion_tuple)
     if argyll:
         newversion_desc = "ArgyllCMS"
+        # TODO: I hate this, but this is the easiest way to fix
+        #       https://github.com/eoyilmaz/displaycal-py3/issues/291
+        #       we don't have access to displaycal.net to update the ArgylCMS
+        #       version. So, this mechanism should be updated to use some
+        #       other way of getting newer app versions...
+        newversion = "3.1.0"
     else:
         newversion_desc = appname
-    newversion_desc += " " + newversion
+    newversion_desc += f" {newversion}"
     if snapshot:
         newversion_desc += " Beta"
     if download:
-        msg = lang.getstr("download") + " " + newversion_desc
+        msg = "{} {}".format(lang.getstr("download"), newversion_desc)
     else:
         msg = lang.getstr("update_check.new_version", newversion_desc)
     dlg = ConfirmDialog(
@@ -623,8 +629,10 @@ def app_update_confirm(
             consumer = worker.process_download
             dlname = appname
             sep = "-"
+            domain = DOMAIN
             if argyll:
                 consumer = worker.process_argyll_download
+                domain = "www.argyllcms.com"  # force Argyll downloads
                 dlname = "Argyll"
                 sep = "_V"
                 if sys.platform == "win32":
@@ -670,7 +678,7 @@ def app_update_confirm(
                 worker.download,
                 ckwargs={"exit": dlname == appname},
                 wargs=(
-                    f"https://{DOMAIN}/download{folder}/{dlname}{sep}{sep}{suffix}",
+                    f"https://{domain}/{folder}/{dlname}{sep}{newversion}{suffix}",
                 ),
                 progress_msg=lang.getstr("downloading"),
                 fancy=False,
@@ -1820,6 +1828,7 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
         # Check for required resource files and get pre-canned testcharts
         self.dist_testcharts = []
         self.dist_testchart_names = []
+        self.menubar = None
         missing = []
         for filename in resfiles:
             path, ext = (
@@ -2675,7 +2684,7 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
             res.LoadFromBuffer(xrc_xml)
             self.menubar = PopupMenu(self.header)
             for label in ("file", "options", "tools", "language", "help"):
-                menu_label = "menu." + label
+                menu_label = f"menu.{label}"
                 if label == "help":
                     menu_name = "wxID_HELP"
                 else:
@@ -2685,7 +2694,13 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
             self.header.Bind(wx.EVT_RIGHT_UP, lambda e: self.menubar.popup())
         else:
             res = xrc.XmlResource(menu_xrc_path)
-            self.menubar = res.LoadMenuBar("menu")
+            self.menubar = res.LoadMenuBar(self, "menu")
+            if sys.platform == "darwin":
+                # https://github.com/eoyilmaz/displaycal-py3/issues/303
+                # set the menubar as the common menu bar,
+                # otherwise it will be hidden when the measurement window is
+                # shown
+                wx.MenuBar.MacSetCommonMenuBar(self.menubar)
 
         file_ = self.menubar.GetMenu(self.menubar.FindMenu("menu.file"))
         menuitem = file_.FindItemById(file_.FindItem("calibration.load"))
@@ -11506,9 +11521,10 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
                     ok=lang.getstr("ok"),
                     bitmap=geticon(32, "dialog-error"),
                 )
+
             if sys.platform == "darwin":
                 # For some reason, the call to enable_menus() in Show()
-                # sometimes isn't enough under Mac OS X (e.g. after calibrate &
+                # sometimes isn't enough under MacOS (e.g. after calibrate &
                 # profile)
                 self.enable_menus()
             self.start_timers(True)

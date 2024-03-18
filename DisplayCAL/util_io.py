@@ -285,7 +285,7 @@ class TarFileProper(tarfile.TarFile):
             tarinfo._link_target = os.path.join(path, name)
 
         try:
-            name = tarinfo.name.decode(self.encoding)
+            name = tarinfo.name
             if not full:
                 name = os.path.basename(name)
             self._extract_member(tarinfo, os.path.join(path, name))
@@ -329,12 +329,12 @@ class TarFileProper(tarfile.TarFile):
 
         # Set correct owner, mtime and filemode on directories.
         for tarinfo in directories:
-            name = tarinfo.name.decode(self.encoding)
+            name = tarinfo.name
             if not full:
                 name = os.path.basename(name)
             dirpath = os.path.join(path, name)
             try:
-                self.chown(tarinfo, dirpath)
+                self.chown(tarinfo, dirpath, numeric_owner=False)
                 self.utime(tarinfo, dirpath)
                 self.chmod(tarinfo, dirpath)
             except tarfile.ExtractError as e:

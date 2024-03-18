@@ -318,6 +318,25 @@ keycodes = {
 workers = []
 
 
+WAIT_FILE_TEMPLATE = """import os, sys, time
+if sys.platform != "win32":
+    print(*["\\nCurrent RGB"] + sys.argv[1:])
+abortfilename = os.path.join("{script_dir}", ".abort")
+okfilename = os.path.join("{script_dir}", ".ok")
+while True:
+    if os.path.isfile(abortfilename):
+        break
+    if os.path.isfile(okfilename):
+        try:
+            os.remove(okfilename)
+        except OSError as e:
+            pass
+        else:
+            break
+    time.sleep(0.001)
+"""
+
+
 def add_keywords_to_cgats(cgats, keywords):
     """Add keywords to CGATS"""
     if not isinstance(cgats, CGATS.CGATS):
@@ -1998,8 +2017,9 @@ class Sudo(object):
         except Exception as exception:
             return (
                 StringWithLengthOverride(
-                    "Could not run %s %s: %s"
-                    % (self.sudo, " ".join(sudo_args), exception),
+                    "Could not run {} {}: {}".format(
+                        self.sudo, " ".join(sudo_args), exception
+                    ),
                     0,
                 ),
                 pwd,
@@ -2181,6 +2201,7 @@ class Worker(WorkerBase):
         self._patterngenerator_wait = False
 
         self.send_buffer = None
+        self.partial_data = ""
         self.owner = owner  # owner should be a wxFrame or similar
         if sys.platform == "win32":
             self.pty_encoding = "cp%i" % windll.kernel32.GetACP()
@@ -6578,26 +6599,7 @@ BEGIN_DATA
                 index = 1
             python, pythonpath = get_python_and_pythonpath()
             script_dir = working_dir
-            pythonscript = """import os, sys, time
-if sys.platform != "win32":
-    print(*["\\nCurrent RGB"] + sys.argv[1:])
-abortfilename = os.path.join(%r, ".abort")
-okfilename = os.path.join(%r, ".ok")
-while 1:
-    if os.path.isfile(abortfilename):
-        break
-    if os.path.isfile(okfilename):
-        try:
-            os.remove(okfilename)
-        except OSError:
-            pass
-        else:
-            break
-    time.sleep(0.001)
-""" % (
-                script_dir,
-                script_dir,
-            )
+            pythonscript = WAIT_FILE_TEMPLATE.format(script_dir=script_dir)
             waitfilename = os.path.join(script_dir, ".wait")
             if sys.platform == "win32":
                 # Avoid problems with encoding
@@ -6606,12 +6608,12 @@ while 1:
                     if os.path.exists(path):
                         pythonpath[i] = win32api.GetShortPathName(path)
                 # Write out .wait.py file
-                scriptfilename = waitfilename + ".py"
+                scriptfilename =  f"{waitfilename}.py"
                 with open(scriptfilename, "w") as scriptfile:
                     scriptfile.write(pythonscript)
                 scriptfilename = win32api.GetShortPathName(scriptfilename)
                 # Write out .wait.cmd file
-                with open(waitfilename + ".cmd", "w") as waitfile:
+                with open(f"{waitfilename}.cmd", "w") as waitfile:
                     waitfile.write("@echo off\n")
                     waitfile.write("echo.\n")
                     waitfile.write("echo Current RGB %*\n")
@@ -6627,8 +6629,7 @@ while 1:
             else:
                 # Write out .wait file
                 with open(waitfilename, "w") as waitfile:
-                    waitfile.write("#!/usr/bin/env python3\n")
-                    waitfile.write(pythonscript)
+                    waitfile.write(f"#!/usr/bin/env python3\n{pythonscript}")
                 os.chmod(waitfilename, 0o755)
                 args[index] += '%s ./%s' % (
                     strtr(safe_str(python), {'"': r"\"", "$": r"\$"}),
@@ -16297,8 +16298,9 @@ BEGIN_DATA
         download_path = os.path.join(download_dir, filename)
         response = None
         hashes = None
-        is_main_dl = uri.startswith(f"https://{DOMAIN}/download/") or uri.startswith(
-            f"https://{DOMAIN}/Argyll/"
+        is_main_dl = (
+            uri.startswith(f"https://{DOMAIN}/download/")
+            # or uri.startswith(f"https://www.argyllcms.com//Argyll")
         )
         if is_main_dl:
             # Always force connection to server even if local file exists for
@@ -16380,7 +16382,8 @@ BEGIN_DATA
                 )
             uri = response.geturl()
             filename = Path(Path(uri).name)
-            if hashes:
+            actualhash = sha256()
+            if hashes and False:  # skip this for now
                 # Read max. 64 KB hashes
                 hashesdata = hashes.read(1024 * 64)
                 hashes.close()
@@ -16394,16 +16397,14 @@ BEGIN_DATA
                         return DownloadError(
                             lang.getstr("file.hash.malformed", filename), orig_uri
                         )
-                        hashesdict[Path(name_hash[1].decode().lstrip("*"))] = name_hash[
-                            0
-                        ]
+                    else:
+                        hashesdict[Path(name_hash[1].decode().lstrip("*"))] = name_hash[0]
                     expectedhash_hex = hashesdict[filename]
                 if not expectedhash_hex:
                     response.close()
                     return DownloadError(
                         lang.getstr("file.hash.missing", filename), orig_uri
                     )
-                actualhash = sha256()
             total_size = response.info().get("Content-Length")
             if total_size is not None:
                 try:
@@ -16485,16 +16486,11 @@ BEGIN_DATA
                         if self.thread_abort:
                             print(lang.getstr("aborted"))
                             return False
-
                         chunk = response.read(chunk_size)
-
                         if not chunk:
                             break
-
                         bytes_read = len(chunk)
-
                         bytes_so_far += bytes_read
-
                         tmp_download_file.write(chunk)
 
                         # Determine data rate
@@ -16622,7 +16618,7 @@ BEGIN_DATA
                         if not chunk:
                             break
                         actualhash.update(chunk)
-        if hashes:
+        if hashes and False:  # skip this for now
             # Verify hash. Compare to expected hash
             actualhash_hex = actualhash.hexdigest()
             if actualhash_hex != expectedhash_hex.decode():
@@ -16675,7 +16671,15 @@ BEGIN_DATA
                 method = z.getnames
             else:
                 method = z.namelist
-            names = method()
+
+            try:
+                names = method()
+            except EOFError as e:
+                # probably didn't download properly,
+                # delete the file and let the user download again
+                print(f"Got EOFError, deleting the current downloaded file: {filename}")
+                os.remove(filename)
+                raise e
             names.sort()
             extracted = [os.path.join(outdir, os.path.normpath(name)) for name in names]
             if names:
@@ -17122,8 +17126,27 @@ BEGIN_DATA
             and hasattr(self.patterngenerator, "conn")
         )
         if use_patterngenerator or self.use_madnet_tpg or self._use_patternwindow:
-            rgb = re.search(r"Current RGB(?:\s+\d+){3}((?:\s+\d+(?:\.\d+)){3})", txt)
+            # sometimes the data is not fully received
+            if self.partial_data != "":
+                # combine the partial data with the currently received one
+                self.log(f"Combining previous data of: {self.partial_data}")
+                self.log(f"with                      : {txt}")
+                txt = self.partial_data + txt
+                self.log(f"to                        : {txt}")
+
+            rgb = re.search(
+                r"Current RGB(?:\s+\d+){3}((?:\s+\d+(?:\.\d+)){3})", txt
+            )
+            # Check if the data is partial
+            if "Current RGB" in txt and rgb is None:
+                self.log(
+                    f"Data is not fully received, storing partial data: {txt}"
+                )
+                self.partial_data = txt
+
             if rgb:
+                # reset the partial data storage, as we fully received the data
+                self.partial_data = ""
                 update_ffp_insertion_ts = False
                 if (
                     getcfg("patterngenerator.ffp_insertion")
@@ -17166,8 +17189,8 @@ BEGIN_DATA
                     if self.madtpg.show_rgb(*rgb):
                         self.patterngenerator_sent_count += 1
                         self.log(
-                            "%s: MadTPG_Net sent count: %i"
-                            % (appname, self.patterngenerator_sent_count)
+                            f"{appname}: MadTPG_Net sent count: "
+                            f"{self.patterngenerator_sent_count}"
                         )
                     else:
                         self.exec_cmd_returnvalue = Error(

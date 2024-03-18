@@ -692,8 +692,7 @@ class CustomGridCellEvent(CustomEvent):
 
 
 class PopupMenu(object):
-
-    """A collection of menus that has a wx.MenuBar-like interface"""
+    """A collection of menus that has a wx.MenuBar-like interface."""
 
     def __init__(self, parent):
         self.Parent = parent
@@ -726,7 +725,25 @@ class PopupMenu(object):
         return len(self._menus)
 
     def GetMenus(self):
+        """Return menus.
+
+        Returns:
+            List[wx.Menu]: List of child menus.
+        """
         return list(self._menus)
+
+    def SetMenus(self, menus):
+        """Set menus.
+
+        Args:
+            menus (List[wx.Menu]): A list of wx.Menu instances to set as a
+                child of this menubar.
+        """
+        self._menus = []
+        for menu, label in menus:
+            self.Append((menu, label))
+
+    Menus = property(GetMenus, SetMenus)
 
     def IsEnabledTop(self, pos):
         return self._enabledtop.get(pos, True)
@@ -734,10 +751,6 @@ class PopupMenu(object):
     def SetMenuLabel(self, pos, label):
         self._menus[pos] = (self._menus[pos][0], label)
 
-    def SetMenus(self, menus):
-        self._menus = []
-        for menu, label in menus:
-            self.Append((menu, label))
 
     def bind_keys(self):
         if sys.platform == "darwin":
@@ -793,8 +806,6 @@ class PopupMenu(object):
 
         # Now we can safely destroy the menu without affecting submenus
         top_menu.Destroy()
-
-    Menus = property(GetMenus, SetMenus)
 
 
 class FileDrop(wx.FileDropTarget):

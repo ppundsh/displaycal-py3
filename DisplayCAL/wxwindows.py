@@ -3846,11 +3846,13 @@ class BorderGradientButton(GradientButton):
                 # Focus state
                 topStart = wx.Colour(*gamma_encode(105, 177, 250))
                 topEnd = wx.Colour(*gamma_encode(12, 128, 255))
-                fgcolor = wx.WHITE
+                # fgcolor = wx.WHITE
+                fgcolor = wx.BLACK
             else:
                 # Normal state
                 topStart = wx.WHITE
                 topEnd = wx.WHITE
+                fgcolor = wx.BLACK
         elif capture != self:
             # Normal, hover or focus state
             if self._mouseAction == HOVER:
@@ -3999,20 +4001,19 @@ class BorderGradientButton(GradientButton):
         else:
             bw = bh = 0
 
-        pos_x = (
-            width - bw - tw
-        ) / 2 + shadowOffset  # adjust for bitmap and text to centre
+        # adjust for bitmap and text to centre
+        pos_x = (width - bw - tw) / 2 + shadowOffset
         if self.IsEnabled():
             if capture == self and self._mouseAction in (CLICK, HOVER):
                 bitmap = self._bitmapselected
             elif capture != self and self._hasFocus:
                 bitmap = self._bitmapfocus
             elif self._mouseAction == HOVER and not get_dialogs(True):
-                bitmap = self._bitmaphover
+                bitmap = self._bitmapfocus # self._bitmaphover
             else:
-                bitmap = self._bitmap
+                bitmap = self._bitmapfocus # self._bitmap
         else:
-            bitmap = self._bitmapdisabled
+            bitmap = self._bitmapfocus # self._bitmapdisabled
         if bitmap:
             pos_y = (height - bh) / 2 + shadowOffset
             gc.DrawBitmap(bitmap, pos_x, pos_y, bw, bh)  # draw bitmap if available

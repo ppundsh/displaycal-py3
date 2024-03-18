@@ -268,9 +268,9 @@
 "audio.lib": |-
   Audio module: %s
 "auth": |-
-  Authentification
+  Authentication
 "auth.failed": |-
-  Authentification failed.
+  Authentication failed.
 "auto": |-
   Auto
 "auto_optimized": |-
