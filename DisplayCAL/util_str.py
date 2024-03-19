@@ -262,7 +262,7 @@ def asciize(obj):
 codecs.register_error("asciize", asciize)
 
 
-def safe_asciize(obj):
+def safe_asciize(obj) -> bytes:
     """Turn several unicode chars into an ASCII representation.
 
     This function either takes a string or an exception as argument (when used

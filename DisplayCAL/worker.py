@@ -13961,7 +13961,8 @@ usage: spotread [-options] [logfile]
                         # Copy to temp dir and give ASCII-only name to
                         # avoid profile install issues
                         profile_tmp_path = os.path.join(
-                            tmp_dir, safe_asciize(profile_name)
+                            tmp_dir,
+                            safe_asciize(profile_name).decode("utf-8", "ignore")
                         )
                     else:
                         profile_tmp_path = os.path.join(tmp_dir, profile_name)
