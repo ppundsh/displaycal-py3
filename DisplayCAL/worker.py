@@ -15031,13 +15031,13 @@ usage: spotread [-options] [logfile]
                     src = os.path.splitext(os.path.basename(src))[0]
                 else:
                     if mods:
-                        src += " " + "".join(["[%s]" % mod.upper() for mod in mods])
-                    src_path = get_data_path("ref/%s.gam" % src)
+                        src += " " + "".join([f"[{mod.upper()}]"  for mod in mods])
+                    src_path = get_data_path(f"ref/{src}.gam")
                 if not src_path:
                     continue
                 outfilename = outname + " vs " + src
                 if mods:
-                    outfilename += " " + "".join(["[%s]" % mod.upper() for mod in mods])
+                    outfilename += " " + "".join([f"[{mod.upper()}]" for mod in mods])
                 outfilename += ".wrl"
                 tmpfilenames.append(outfilename)
                 # Multi-threaded gamut view calculation
@@ -15069,26 +15069,27 @@ usage: spotread [-options] [logfile]
             printcmdline(viewgam, args, fn=self.log, cwd=os.path.dirname(args[-1]))
             self.log("")
             self.log("".join(worker.output))
+
         if not isinstance(result, Exception) and result:
             for tmpfilename in tmpfilenames:
-                if tmpfilename == gamfilename and tmpfilename != outname + ".gam":
+                if tmpfilename == gamfilename and tmpfilename != f"{outname}.gam":
                     # Use the original file name
-                    filename = outname + ".gam"
-                elif tmpfilename == wrlfilename and tmpfilename != outname + ".wrl":
+                    filename = f"{outname}.gam"
+                elif tmpfilename == wrlfilename and tmpfilename != f"{outname}.wrl":
                     # Use the original file name
-                    filename = outname + ".wrl"
+                    filename = f"{outname}.wrl"
                 else:
                     filename = tmpfilename
-                try:
 
+                try:
                     def tweak_vrml(vrml):
                         # Set viewpoint further away
                         vrml = re.sub(
-                            r"(Viewpoint\s*\{)[^}]+\}", r"\1 position 0 0 340 }", vrml
+                            rb"(Viewpoint\s*\{)[^}]+\}", rb"\1 position 0 0 340 }", vrml
                         )
                         # Fix label color for -a* axis
                         label = re.search(
-                            r'Transform\s*\{\s*translation\s+[+\-0-9.]+\s*[+\-0-9.]+\s*[+\-0-9.]+\s+children\s*\[\s*Shape\s*\{\s*geometry\s+Text\s*\{\s*string\s*\["-a\*"\]\s*fontStyle\s+FontStyle\s*\{[^}]*\}\s*\}\s*appearance\s+Appearance\s*\{\s*material\s+Material\s*{[^}]*\}\s*\}\s*\}\s*\]\s*\}',
+                            rb'Transform\s*\{\s*translation\s+[+\-0-9.]+\s*[+\-0-9.]+\s*[+\-0-9.]+\s+children\s*\[\s*Shape\s*\{\s*geometry\s+Text\s*\{\s*string\s*\["-a\*"\]\s*fontStyle\s+FontStyle\s*\{[^}]*\}\s*\}\s*appearance\s+Appearance\s*\{\s*material\s+Material\s*{[^}]*\}\s*\}\s*\}\s*\]\s*\}',
                             vrml,
                         )
                         if label:
@@ -15096,27 +15097,27 @@ usage: spotread [-options] [logfile]
                             vrml = vrml.replace(
                                 label,
                                 re.sub(
-                                    r"(diffuseColor)\s+[+\-0-9.]+\s+[+\-0-9.]+\s+[+\-0-9.]+",
-                                    r"\1 0.0 1.0 0.0",
+                                    rb"(diffuseColor)\s+[+\-0-9.]+\s+[+\-0-9.]+\s+[+\-0-9.]+",
+                                    rb"\1 0.0 1.0 0.0",
                                     label,
                                 ),
                             )
                         # Add range to axes
                         vrml = re.sub(
-                            r'(string\s*\[")(\+?)(L\*)("\])', r'\1\3", "\2\0$\4', vrml
+                            rb'(string\s*\[")(\+?)(L\*)("\])', rb'\1\3", b"\2\0$\4', vrml
                         )
                         vrml = re.sub(
-                            r'(string\s*\[")([+\-]?)(a\*)("\])',
-                            r'\1\3", "\2\0$\4',
+                            rb'(string\s*\[")([+\-]?)(a\*)("\])',
+                            rb'\1\3", b"\2\0$\4',
                             vrml,
                         )
                         vrml = re.sub(
-                            r'(string\s*\[")([+\-]?)(b\*)("\])', r"\1\3 \2\0$\4", vrml
+                            rb'(string\s*\[")([+\-]?)(b\*)("\])', rb"\1\3 \2\0$\4", vrml
                         )
-                        vrml = vrml.replace("\0$", "100")
+                        vrml = vrml.replace(b"\0$", b"100")
                         return vrml
 
-                    gzfilename = filename + ".gz"
+                    gzfilename = f"{filename}.gz"
                     if sys.platform == "win32":
                         filename = make_win32_compatible_long_path(filename)
                         gzfilename = make_win32_compatible_long_path(gzfilename)
