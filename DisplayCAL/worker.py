@@ -320,7 +320,7 @@ workers = []
 
 WAIT_FILE_TEMPLATE = """import os, sys, time
 if sys.platform != "win32":
-    print(*["\\nCurrent RGB"] + sys.argv[1:])
+    print(*(["\\nCurrent RGB"] + sys.argv[1:]))
 abortfilename = os.path.join("{script_dir}", ".abort")
 okfilename = os.path.join("{script_dir}", ".ok")
 while True:
