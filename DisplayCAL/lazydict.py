@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-
-
 import codecs
 import json
 import os
+import traceback
 
 from DisplayCAL.config import get_data_path
 from DisplayCAL.debughelpers import handle_error
@@ -621,6 +620,7 @@ def test():
             return yaml.safe_load(StringIO(doc))
         except Exception as e:
             print("%s:" % e.__class__.__name__, e)
+            traceback.print_exc()
             return e
 
     def l(doc):
@@ -629,6 +629,7 @@ def test():
             l.parse(StringIO(doc))
         except Exception as e:
             print("%s:" % e.__class__.__name__, e)
+            traceback.print_exc()
             return e
         return l
 

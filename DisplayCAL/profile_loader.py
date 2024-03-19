@@ -902,6 +902,7 @@ if sys.platform == "win32":
                     profile = ICCP.ICCProfile(pth)
                 except ICCP.ICCProfileInvalidError as exception:
                     print("%s:" % pth, exception)
+                    traceback.print_exc()
                     continue
                 except IOError as exception:
                     print(exception)
