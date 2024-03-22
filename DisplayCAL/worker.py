@@ -13370,7 +13370,7 @@ usage: spotread [-options] [logfile]
                 else:
                     value = None
                 if value is not None:
-                    ti3[0].add_keyword(keyword, safe_str(value, "UTF-7"))
+                    ti3[0].add_keyword(keyword, safe_str(value, "utf-8"))
                 elif keyword in ti3[0]:
                     ti3[0].remove_keyword(keyword)
             # 3D LUT content color space (currently only used for HDR)
@@ -13384,7 +13384,7 @@ usage: spotread [-options] [logfile]
                         value = getcfg(
                             "3dlut.content.colorspace.{}.{}".format(color, coord)
                         )
-                        ti3[0].add_keyword(keyword, safe_str(value, "UTF-7"))
+                        ti3[0].add_keyword(keyword, safe_str(value, "utf-8"))
                     elif keyword in ti3[0]:
                         ti3[0].remove_keyword(keyword)
             ti3[0].fix_zero_measurements(logfile=self.get_logfiles(False))

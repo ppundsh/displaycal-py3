@@ -13218,12 +13218,12 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
                         display = (
                             meta.get("EDID_model", meta.get("EDID_model_id", {}))
                             .get("value", "")
-                            .encode("UTF-7")
+                            .encode("utf-8")
                         )
                         manufacturer = (
                             meta.get("EDID_manufacturer", {})
                             .get("value", "")
-                            .encode("UTF-7")
+                            .encode("utf-8")
                         )
                         cgats.ARGYLL_COLPROF_ARGS.add_data(
                             '-M "%s" -A "%s"' % (display, manufacturer)
@@ -13824,7 +13824,7 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
                     b'\nOBSERVER "%s"\\1' % observer.replace(b"\\", b"\\\\"),
                     cgats,
                 )
-            if reference_observer.encode("utf-8") and not re.search(
+            if reference_observer and not re.search(
                 rb'\nREFERENCE_OBSERVER\s+".+?"\n', cgats
             ):
                 # By default, CCMX/CCSS files don't contain observer
@@ -14994,15 +14994,6 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
             if debug:
                 print("[D] display_ctrl_handler -> lut_viewer_load_lut END")
         self.update_use_video_lut()
-        # Special case: Resolve. Needs a minimum display update delay of
-        # atleast 600 ms for repeatable measurements. This is a Resolve
-        # issue. There seem to be quite a few bugs that were introduced in
-        # Resolve via the version 10.1.x to 11.x transition.
-        is_resolve = config.get_display_name() == "Resolve"
-        update_delay_ctrls = setcfg_cond(
-            is_resolve, "measure.min_display_update_delay_ms", 1000
-        )
-        setcfg_cond(is_resolve, "measure.override_min_display_update_delay_ms", 1)
         # Enable 3D LUT tab for virtual displays & eeColor
         enable_3dlut_tab = (
             config.is_virtual_display() or config.get_display_name() == "SII REPEATER"
@@ -15010,10 +15001,6 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
         setcfg_cond(
             enable_3dlut_tab, "3dlut.tab.enable", 1, True, not getcfg("3dlut.create")
         )
-        if update_delay_ctrls:
-            override = bool(getcfg("measure.override_min_display_update_delay_ms"))
-            getattr(self, "override_min_display_update_delay_ms").SetValue(override)
-            self.update_display_delay_ctrl("min_display_update_delay_ms", override)
         self.update_drift_compensation_ctrls()
         self.show_display_delay_ctrls()
         self.show_ffp_ctrls()
