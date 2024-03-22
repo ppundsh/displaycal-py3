@@ -13505,30 +13505,21 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
                 flag=wx.ALL | wx.ALIGN_LEFT | wx.EXPAND,
                 border=4,
             )
-            use_display_txt_ctrl = not display
-            if use_display_txt_ctrl:
-                boxsizer = wx.StaticBoxSizer(
-                    wx.StaticBox(dlg, -1, lang.getstr("display")), wx.VERTICAL
-                )
-                dlg.sizer3.Add(boxsizer, 1, flag=wx.TOP | wx.EXPAND, border=12)
-                if sys.platform not in ("darwin", "win32"):
-                    boxsizer.Add((1, 8))
-                if not config.is_virtual_display():
-                    display = self.worker.get_display_name(False, True, False)
-                # "display" is never assigned anything from line 13402 and remains a NoneType, which throws an error in the following "dlg.display_txt_ctrl"
-                # It looks like another byte vs. string issue all the way back in how the ARGYLL_COLPROF_ARGS section is written into the reference.ti3
-                # So for now, this puts the short name of virtual displays into the dialog box so the process can continue
-                else: display = self.worker.get_display_name_short()
-                dlg.display_txt_ctrl = wx.TextCtrl(dlg, -1, display, size=(400, -1))
-                boxsizer.Add(
-                    dlg.display_txt_ctrl,
-                    1,
-                    flag=wx.ALL | wx.ALIGN_LEFT | wx.EXPAND,
-                    border=4,
-                )
-            use_manufacturer_txt_ctrl = (
-                not manufacturer and not config.is_virtual_display(display)
+            boxsizer = wx.StaticBoxSizer(
+                wx.StaticBox(dlg, -1, lang.getstr("display")), wx.VERTICAL
             )
+            dlg.sizer3.Add(boxsizer, 1, flag=wx.TOP | wx.EXPAND, border=12)
+            if sys.platform not in ("darwin", "win32"):
+                boxsizer.Add((1, 8))
+            if not display: display = self.worker.get_display_name(False, True, False) # protects from an improperly formatted display name in the ref.ti3
+            dlg.display_txt_ctrl = wx.TextCtrl(dlg, -1, display, size=(400, -1))
+            boxsizer.Add(
+                dlg.display_txt_ctrl,
+                1,
+                flag=wx.ALL | wx.ALIGN_LEFT | wx.EXPAND,
+                border=4,
+            )
+            use_manufacturer_txt_ctrl = not manufacturer
             if use_manufacturer_txt_ctrl:
                 boxsizer = wx.StaticBoxSizer(
                     wx.StaticBox(dlg, -1, lang.getstr("display.manufacturer")),
@@ -13540,17 +13531,12 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
                 if not pnpidcache:
                     # Populate pnpidcache
                     get_manufacturer_name("???")
-                # CB_SORT isn't supported by wxOSX/Cocoa!
-                # Why isn't this mentioned in the wxPython docs?
-                dlg.manufacturer_txt_ctrl = AutocompleteComboBox(
+                dlg.manufacturer_txt_ctrl = wx.Choice(
                     dlg, -1, choices=natsort(list(pnpidcache.values())), size=(400, -1)
                 )
-                if not manufacturer and display == self.worker.get_display_name(
-                    False, True, False
-                ):
-                    dlg.manufacturer_txt_ctrl.SetStringSelection(
-                        self.worker.get_display_edid().get("manufacturer", "")
-                    )
+                manufacturer_selection = self.worker.get_display_edid().get("manufacturer", "")
+                if len(manufacturer_selection) < 1: manufacturer_selection = "Unknown"
+                dlg.manufacturer_txt_ctrl.SetStringSelection(manufacturer_selection)
                 boxsizer.Add(
                     dlg.manufacturer_txt_ctrl,
                     1,
@@ -13591,8 +13577,7 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
             dlg.Center()
             result = dlg.ShowWindowModalBlocking()
             description = safe_str(dlg.description_txt_ctrl.GetValue().strip(), "UTF-8")
-            if use_display_txt_ctrl:
-                display = dlg.display_txt_ctrl.GetValue()
+            display = dlg.display_txt_ctrl.GetValue()
             if (
                 dlg.display_tech_ctrl.IsEnabled()
                 and dlg.display_tech_ctrl.GetStringSelection()
