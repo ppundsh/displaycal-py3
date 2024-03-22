@@ -617,7 +617,10 @@ class CGATS(dict):
                 elif isinstance(value, (float, int, bytes)):
                     if key not in ("NUMBER_OF_FIELDS", "NUMBER_OF_SETS"):
                         if isinstance(key, int):
-                            result.append(bytes(str(value), "utf-8"))
+                            if isinstance(value, bytes):
+                                result.append(value)
+                            else:
+                                result.append(bytes(str(value), "utf-8"))
                         else:
                             if "KEYWORDS" in self and key in list(
                                 self["KEYWORDS"].values()
