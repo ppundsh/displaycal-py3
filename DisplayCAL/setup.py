@@ -74,6 +74,7 @@ from DisplayCAL.meta import (
     description,
     longdesc,
     DOMAIN,
+    development_home_page,
     name,
     py_maxversion,
     py_minversion,
@@ -695,7 +696,7 @@ def setup():
             data_files.append(
                 (
                     os.path.join(os.path.dirname(data), "metainfo"),
-                    [os.path.join(pydir, "..", "dist", appstream_id + ".appdata.xml")],
+                    [os.path.normpath(os.path.join(pydir, "..", "dist",  f"{appstream_id}.appdata.xml"))],
                 )
             )
             data_files.append(
@@ -995,7 +996,7 @@ setup(ext_modules=[Extension("{name}.lib{bits}.RealDisplaySizeMM", sources={sour
         ],
         "data_files": data_files,
         "description": description,
-        "download_url": f"https://{DOMAIN}/download/{name}-{version}.tar.gz",
+        "download_url": f"{development_home_page}/releases/download/{version}/{name}-{version}.tar.gz",
         "ext_modules": ext_modules,
         "license": "GPL v3",
         "long_description": longdesc,

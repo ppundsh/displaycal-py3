@@ -630,7 +630,7 @@ def setup():
 
                     replace_placeholders(
                         Path(pydir, "misc", f"{tmpl_name}.template.html"),
-                        Path(pydir, tmpl_name + ".html"),
+                        Path(pydir,  f"{tmpl_name}.html"),
                         lastmod_time,
                         {"STABILITY": "Beta" if stability != "stable" else ""},
                     )
@@ -688,9 +688,11 @@ def setup():
 
         languages = "\n\t\t".join(languages)
         tmpl_name = appstream_id + ".appdata.xml"
+        misc_tmpl_name = Path(pydir, "misc", tmpl_name)
+        dist_tmpl_name = Path(pydir, "dist", tmpl_name)
         replace_placeholders(
-            Path(pydir, "misc", tmpl_name),
-            Path(pydir, "dist", tmpl_name),
+            misc_tmpl_name,
+            dist_tmpl_name,
             lastmod_time,
             {
                 "APPDATAPROVIDES": provides,
@@ -698,6 +700,7 @@ def setup():
                 "CHANGELOG": format_changelog(changelog, "appstream"),
             },
         )
+
     if appdata:
         sys.argv.remove("appdata")
 
