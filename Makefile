@@ -13,6 +13,7 @@ help:
 	@echo "Available targets:"
 	@make -qp | grep -o '^[a-z0-9-]\+' | sort
 
+.PHONY: venv
 venv:
 	python3 -m venv $(VIRTUALENV_DIR); \
 	source ./$(VIRTUALENV_DIR)/bin/activate; \
@@ -25,7 +26,7 @@ build: venv FORCE
 
 install:
 	source ./$(VIRTUALENV_DIR)/bin/activate; \
-	pip install ./dist/DisplayCAL-$(VERSION)-*.whl;
+	pip install ./dist/DisplayCAL-$(VERSION)-*.whl --force-reinstall;
 
 launch:
 	source ./.venv/bin/activate; \
