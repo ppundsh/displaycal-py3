@@ -13,13 +13,14 @@ help:
 	@echo "Available targets:"
 	@make -qp | grep -o '^[a-z0-9-]\+' | sort
 
-environment:
+.PHONY: venv
+venv:
 	python3 -m venv $(VIRTUALENV_DIR); \
 	source ./$(VIRTUALENV_DIR)/bin/activate; \
 	pip install -r requirements.txt; \
 	pip install -r requirements-dev.txt;
 
-build: environment FORCE
+build: venv FORCE
 	source ./$(VIRTUALENV_DIR)/bin/activate; \
 	python3 -m build;
 
@@ -66,7 +67,7 @@ new-release:
 # 	twine upload dist/DisplayCAL-$(VERSION).whl
 	twine upload dist/DisplayCAL-$(VERSION).tar.gz
 
-tests: environment build install
+tests: venv build install
 	source $(VIRTUALENV_DIR)/bin/activate; \
 	pytest -v -n auto -W ignore --color=yes --cov-report term;
 
