@@ -644,6 +644,15 @@ def setup():
             )
         else:
             data_files.append((doc, [os.path.join(pydir, "..", "LICENSE.txt")]))
+
+    # metainfo / appdata.xml
+    data_files.append(
+        (
+            os.path.join(os.path.dirname(data), "metainfo"),
+            [os.path.normpath(os.path.join(pydir, "..", "dist",  f"{appstream_id}.appdata.xml"))],
+        )
+    )
+
     if sys.platform not in ("darwin", "win32") or do_py2app or do_py2exe:
         # Linux/Unix or py2app/py2exe
         data_files += get_data(data, "package_data", name, excludes=["theme/icons/*"])
@@ -693,12 +702,6 @@ def setup():
                     print("WARNING: OpenAL32.dll not found!")
         elif sys.platform != "darwin":
             # Linux
-            data_files.append(
-                (
-                    os.path.join(os.path.dirname(data), "metainfo"),
-                    [os.path.normpath(os.path.join(pydir, "..", "dist",  f"{appstream_id}.appdata.xml"))],
-                )
-            )
             data_files.append(
                 (
                     os.path.join(os.path.dirname(data), "applications"),
