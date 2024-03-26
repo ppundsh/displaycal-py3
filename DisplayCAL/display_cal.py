@@ -10985,7 +10985,7 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
             except Exception as exception:
                 wx.CallAfter(show_result_dialog, exception, self)
             else:
-                if cgats.queryv1("INSTRUMENT_TYPE_SPECTRAL").decode("utf-8") == "YES":
+                if cgats.queryv1("INSTRUMENT_TYPE_SPECTRAL") == b"YES":
                     setcfg("last_reference_ti3_path", cgats.filename)
                 else:
                     setcfg("last_colorimeter_ti3_path", cgats.filename)
@@ -13218,12 +13218,12 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
                         display = (
                             meta.get("EDID_model", meta.get("EDID_model_id", {}))
                             .get("value", "")
-                            .encode("utf-8")
+                            .encode("utf-7")
                         )
                         manufacturer = (
                             meta.get("EDID_manufacturer", {})
                             .get("value", "")
-                            .encode("utf-8")
+                            .encode("utf-7")
                         )
                         cgats.ARGYLL_COLPROF_ARGS.add_data(
                             '-M "%s" -A "%s"' % (display, manufacturer)
@@ -13511,7 +13511,9 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
             dlg.sizer3.Add(boxsizer, 1, flag=wx.TOP | wx.EXPAND, border=12)
             if sys.platform not in ("darwin", "win32"):
                 boxsizer.Add((1, 8))
-            if not display: display = self.worker.get_display_name(False, True, False) # protects from an improperly formatted display name in the ref.ti3
+            if not display:
+                # protects from an improperly formatted display name in the ref.ti3
+                display = self.worker.get_display_name(False, True, False)
             dlg.display_txt_ctrl = wx.TextCtrl(dlg, -1, display, size=(400, -1))
             boxsizer.Add(
                 dlg.display_txt_ctrl,

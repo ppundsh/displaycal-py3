@@ -200,7 +200,7 @@ instruments = {
         "sensor_cal": True,
         "skip_sensor_cal": True,
         "integration_time": [9.2, 3.9],  # Still just using i1 Pro values
-        "refresh": False,
+        "refresh": True,
     },
     "ColorHug": {
         "usb_ids": [
