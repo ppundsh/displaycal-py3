@@ -88,7 +88,7 @@ jobs:
     - name: Compile C-Extensions
       run: |
         sudo chmod a+rw /etc/udev/rules.d
-        python3 setup.py install
+        python3 -m build
         cp ./build/lib.linux-x86_64-${{ env.add_dir_str }}/DisplayCAL/lib64/python${{ env.py_version }}/RealDisplaySizeMM.cpython-${{ env.py_version }}-x86_64-linux-gnu.so ./DisplayCAL/lib64/python${{ env.py_version }}/
 
     - name: Test with pytest
