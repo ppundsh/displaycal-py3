@@ -92,9 +92,8 @@ jobs:
         pip install dist/DisplayCAL-*.whl
         export PYPATH=`which python`
         export PYDIR=`dirname $PYPATH`
-        cp $PYDIR/../lib/python${{env.py_version}}/site-packages/DisplayCAL/lib64/RealDisplaySizeMM.cpython-${{ env.py_version}}-x86_64-linux-gnu.so ./DisplayCAL/lib64/python${{ env.py_version }}/
+        cp $PYDIR/../lib/python${{ matrix.python-version }}/site-packages/DisplayCAL/lib64/RealDisplaySizeMM.cpython-${{ env.py_version}}-x86_64-linux-gnu.so ./DisplayCAL/lib64/python${{ env.py_version }}/
         # cp ./build/lib.linux-x86_64-${{ env.add_dir_str }}/DisplayCAL/lib64/python${{ env.py_version }}/RealDisplaySizeMM.cpython-${{ env.py_version }}-x86_64-linux-gnu.so ./DisplayCAL/lib64/python${{ env.py_version }}/
-
     - name: Test with pytest
       run: |
         python -m pytest --verbose --cov=. --cov-report html
