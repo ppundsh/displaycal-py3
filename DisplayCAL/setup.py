@@ -64,6 +64,7 @@ def findall(dir=os.curdir):
 
 
 import distutils.filelist
+
 distutils.filelist.findall = findall  # Fix findall bug in distutils
 
 
@@ -74,6 +75,7 @@ from DisplayCAL.meta import (
     description,
     longdesc,
     DOMAIN,
+    development_home_page,
     name,
     py_maxversion,
     py_minversion,
@@ -199,7 +201,8 @@ def add_lib_excludes(key, excludebits):
     for exclude in ("32", "64"):
         for pycompat in ("38", "39", "310", "311"):
             if key == "win32" and (
-                pycompat == str(sys.version_info[0]) + str(sys.version_info[1]) or exclude == excludebits[0]
+                pycompat == str(sys.version_info[0]) + str(sys.version_info[1])
+                or exclude == excludebits[0]
             ):
                 continue
             config["excludes"][key].extend(
@@ -367,7 +370,7 @@ def create_app_symlinks(dist_dir, scripts):
 
 
 def get_data(tgt_dir, key, pkgname=None, subkey=None, excludes=None):
-    """Return configured data files"""
+    """Return configured data files."""
     files = config[key]
     src_dir = source_dir
     if pkgname:
@@ -381,12 +384,9 @@ def get_data(tgt_dir, key, pkgname=None, subkey=None, excludes=None):
     data = []
     for pth in files:
         if not [exclude for exclude in excludes or [] if fnmatch(pth, exclude)]:
-            data.append(
-                (
-                    os.path.normpath(os.path.join(tgt_dir, os.path.dirname(pth))),
-                    safe_glob(os.path.join(src_dir, pth)),
-                )
-            )
+            normalized_path = os.path.normpath(os.path.join(tgt_dir, os.path.dirname(pth)))
+            safe_path = [relpath(p, src_dir) for p in safe_glob(os.path.join(src_dir, pth))]
+            data.append((normalized_path, safe_path))
     return data
 
 
@@ -470,12 +470,12 @@ def setup():
     if use_setuptools:
         if "--use-setuptools" in sys.argv[1:] and not os.path.exists("use-setuptools"):
             open("use-setuptools", "w").close()
-        try:
-            from ez_setup import use_setuptools as ez_use_setuptools
-
-            ez_use_setuptools()
-        except ImportError:
-            pass
+        # try:
+        #     from ez_setup import use_setuptools as ez_use_setuptools
+        #
+        #     ez_use_setuptools()
+        # except ImportError:
+        #     pass
         try:
             import setuptools
             from setuptools import setup, Extension, find_packages
@@ -522,7 +522,10 @@ def setup():
         sys.argv = sys.argv[:i] + ["install"] + sys.argv[i + 1:]
         install.create_home_path = lambda self: None
 
-    if skip_instrument_conf_files := "--skip-instrument-configuration-files" in sys.argv[1:]:
+    if (
+        skip_instrument_conf_files := "--skip-instrument-configuration-files"
+        in sys.argv[1:]
+    ):
         i = sys.argv.index("--skip-instrument-configuration-files")
         sys.argv = sys.argv[:i] + sys.argv[i + 1:]
 
@@ -613,9 +616,11 @@ def setup():
     # on Mac OS X and Windows, we want data files in the package dir
     # (package_data will be ignored when using py2exe)
     package_data = {
-        name: config["package_data"][name]
-        if sys.platform in ("darwin", "win32") and not do_py2app and not do_py2exe
-        else []
+        name: (
+            config["package_data"][name]
+            if sys.platform in ("darwin", "win32") and not do_py2app and not do_py2exe
+            else []
+        )
     }
     if sdist and sys.platform in ("darwin", "win32"):
         package_data[name].extend(
@@ -642,7 +647,33 @@ def setup():
                 )
             )
         else:
-            data_files.append((doc, [os.path.join(pydir, "..", "LICENSE.txt")]))
+            data_files.append(
+                (
+                    doc,
+                    [
+                        relpath(
+                            os.path.join(pydir, "..", "LICENSE.txt"),
+                            source_dir
+                        )
+                    ]
+                )
+            )
+
+    # metainfo / appdata.xml
+    data_files.append(
+        (
+            os.path.join(os.path.dirname(data), "metainfo"),
+            [
+                relpath(
+                    os.path.normpath(
+                        os.path.join(pydir, "..", "dist", f"{appstream_id}.appdata.xml")
+                    ),
+                    source_dir,
+                )
+            ],
+        )
+    )
+
     if sys.platform not in ("darwin", "win32") or do_py2app or do_py2exe:
         # Linux/Unix or py2app/py2exe
         data_files += get_data(data, "package_data", name, excludes=["theme/icons/*"])
@@ -694,12 +725,6 @@ def setup():
             # Linux
             data_files.append(
                 (
-                    os.path.join(os.path.dirname(data), "metainfo"),
-                    [os.path.join(pydir, "..", "dist", appstream_id + ".appdata.xml")],
-                )
-            )
-            data_files.append(
-                (
                     os.path.join(os.path.dirname(data), "applications"),
                     [os.path.join(pydir, "..", "misc", f"{name.lower()}.desktop")]
                     + safe_glob(
@@ -709,9 +734,11 @@ def setup():
             )
             data_files.append(
                 (
-                    autostart
-                    if os.geteuid() == 0 or prefix.startswith("/")
-                    else autostart_home,
+                    (
+                        autostart
+                        if os.geteuid() == 0 or prefix.startswith("/")
+                        else autostart_home
+                    ),
                     [
                         os.path.join(
                             pydir,
@@ -911,7 +938,8 @@ def setup():
 from distutils.core import setup, Extension
 
 setup(ext_modules=[Extension("{name}.lib{bits}.RealDisplaySizeMM", sources={sources}, define_macros={macros}, extra_link_args={link_args})])""",
-                    ] + sys.argv[1:],
+                    ]
+                    + sys.argv[1:],
                     stdout=sp.PIPE,
                     stderr=sp.STDOUT,
                 )
@@ -956,12 +984,7 @@ setup(ext_modules=[Extension("{name}.lib{bits}.RealDisplaySizeMM", sources={sour
     if sdist:
         # For source distributions we want all libraries
         for pycompat in ("38", "39", "310", "311"):
-            packages.extend(
-                [
-                    f"{name}.lib{bits}",
-                    f"{name}.lib{bits}.python{pycompat}"
-                ]
-            )
+            packages.extend([f"{name}.lib{bits}", f"{name}.lib{bits}.python{pycompat}"])
     elif sys.platform == "darwin":
         # On Mac OS X we only want the universal binaries
         packages.append(f"{name}.lib{bits}")
@@ -995,7 +1018,7 @@ setup(ext_modules=[Extension("{name}.lib{bits}.RealDisplaySizeMM", sources={sour
         ],
         "data_files": data_files,
         "description": description,
-        "download_url": f"https://{DOMAIN}/download/{name}-{version}.tar.gz",
+        "download_url": f"{development_home_page}/releases/download/{version}/{name}-{version}.tar.gz",
         "ext_modules": ext_modules,
         "license": "GPL v3",
         "long_description": longdesc,
@@ -1005,8 +1028,7 @@ setup(ext_modules=[Extension("{name}.lib{bits}.RealDisplaySizeMM", sources={sour
         "package_data": package_data,
         "package_dir": {name: name},
         "platforms": [
-            "Python >= %s <= %s"
-            % (
+            "Python >= {} <= {}".format(
                 ".".join(str(n) for n in py_minversion),
                 ".".join(str(n) for n in py_maxversion),
             ),
@@ -1024,13 +1046,14 @@ setup(ext_modules=[Extension("{name}.lib{bits}.RealDisplaySizeMM", sources={sour
     if setuptools:
         attrs["entry_points"] = {
             "gui_scripts": [
-                "%s = %s.main:main%s"
-                % (
+                "{} = {}.main:main{}".format(
                     script,
                     name,
-                    ""
-                    if script == name.lower()
-                    else script[len(name):].lower().replace("-", "_"),
+                    (
+                        ""
+                        if script == name.lower()
+                        else script[len(name):].lower().replace("-", "_")
+                    ),
                 )
                 for script, desc in scripts
             ]
@@ -1271,7 +1294,7 @@ setup(ext_modules=[Extension("{name}.lib{bits}.RealDisplaySizeMM", sources={sour
                 "excludes": config["excludes"]["all"] + config["excludes"]["win32"],
                 "bundle_files": 3 if wx.VERSION >= (2, 8, 10, 1) else 1,
                 "compressed": 1,
-                "optimize": 0  # 0 = don’t optimize (generate .pyc)
+                "optimize": 0,  # 0 = don’t optimize (generate .pyc)
                 # 1 = normal optimization (like python -O)
                 # 2 = extra optimization (like python -OO)
             }
@@ -1545,8 +1568,7 @@ setup(ext_modules=[Extension("{name}.lib{bits}.RealDisplaySizeMM", sources={sour
         for _datadir, datafiles in attrs.get("data_files", []):
             for datafile in datafiles:
                 manifest_in.append(
-                    "include "
-                    + (
+                    "include {}".format(
                         relpath(os.path.sep.join(datafile.split("/")), source_dir)
                         or datafile
                     )
@@ -1568,13 +1590,16 @@ setup(ext_modules=[Extension("{name}.lib{bits}.RealDisplaySizeMM", sources={sour
                     "include " + os.path.sep.join([pkgdir] + obj.split("/"))
                 )
         for pymod in attrs.get("py_modules", []):
-            manifest_in.append("include " + os.path.join(*pymod.split(".")))
-        manifest_in.append("include " + os.path.join(name, "theme", "theme-info.txt"))
+            manifest_in.append("include {}".format(os.path.join(*pymod.split("."))))
         manifest_in.append(
-            "recursive-include %s %s %s"
-            % (os.path.join(name, "theme", "icons"), "*.icns", "*.ico")
+            "include {}".format(os.path.join(name, "theme", "theme-info.txt"))
         )
-        manifest_in.append("include " + os.path.join("man", "*.1"))
+        manifest_in.append(
+            "recursive-include {} {} {}".format(
+                os.path.join(name, "theme", "icons"), "*.icns", "*.ico"
+            )
+        )
+        manifest_in.append("include {}".format(os.path.join("man", "*.1")))
         manifest_in.append("recursive-include misc *")
         if skip_instrument_conf_files:
             manifest_in.extend(
@@ -1584,9 +1609,9 @@ setup(ext_modules=[Extension("{name}.lib{bits}.RealDisplaySizeMM", sources={sour
                     "exclude misc/*.usermap",
                 ]
             )
-        manifest_in.append("include " + os.path.join("screenshots", "*.png"))
-        manifest_in.append("include " + os.path.join("scripts", "*"))
-        manifest_in.append("include " + os.path.join("tests", "*"))
+        manifest_in.append("include {}".format(os.path.join("screenshots", "*.png")))
+        manifest_in.append("include {}".format(os.path.join("scripts", "*")))
+        manifest_in.append("include {}".format(os.path.join("tests", "*")))
         manifest_in.append("recursive-include theme *")
         manifest_in.append("recursive-include util *.cmd *.py *.sh")
         if sys.platform == "win32" and not setuptools:
@@ -1609,7 +1634,7 @@ setup(ext_modules=[Extension("{name}.lib{bits}.RealDisplaySizeMM", sources={sour
                     pydir,
                     "..",
                     "dist",
-                    "bbfreeze.%s-py%s" % (get_platform(), sys.version[:3]),
+                    "bbfreeze.{}-py{}".format(get_platform(), sys.version[:3]),
                 )
                 sys.argv.insert(i + 1, f"--dist-dir={dist_dir}")
             if "egg_info" not in sys.argv[1:i]:
@@ -1686,6 +1711,7 @@ setup(ext_modules=[Extension("{name}.lib{bits}.RealDisplaySizeMM", sources={sour
 
 def setup_do_py2exe():
     import py2exe
+
     # ModuleFinder can't handle runtime changes to __path__, but win32com
     # uses them
     try:
