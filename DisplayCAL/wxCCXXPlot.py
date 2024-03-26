@@ -346,13 +346,18 @@ class CCXXPlot(wx.Frame):
             x_label = [lang.getstr("matrix")]
             x_label.extend(["%9.6f %9.6f %9.6f" % tuple(row) for row in mtx])
             if ref:
-                ref_observer = cgats.queryv1("REFERENCE_OBSERVER").decode("utf-8")
+                ref_observer = cgats.queryv1("REFERENCE_OBSERVER")
                 if ref_observer:
+                    # If the .ccmx does not contain this value,
+                    # the graph will still draw
+                    ref_observer = ref_observer.decode("utf-8")
                     ref += ", " + observers_ab.get(ref_observer, ref_observer)
                 x_label.append("")
                 x_label.append(ref)
-            fit_method = cgats.queryv1("FIT_METHOD").decode("utf-8")
-            if fit_method == "xy":
+            fit_method = cgats.queryv1("FIT_METHOD")
+            if fit_method == b"xy":
+                # If the .ccmx does not contain this value,
+                # the graph will still draw
                 fit_method = lang.getstr("ccmx.use_four_color_matrix_method")
             elif fit_method:
                 fit_method = lang.getstr("perceptual")
@@ -413,6 +418,7 @@ class CCXXPlot(wx.Frame):
             self.Sizer.Add(bg, 1, flag=wx.EXPAND)
             bg.Sizer.Add(canvas, 1, flag=wx.EXPAND)
         else:
+            bg.MinSize = (int(400 * scale), int(400 * scale))
             self.Sizer.Add(bg, flag=wx.ALIGN_CENTER)
             canvas_w = int(240 * scale)
             canvas.MinSize = (int(canvas_w), int(canvas_w * (74.6 / 67.4)))

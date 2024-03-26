@@ -10985,7 +10985,7 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
             except Exception as exception:
                 wx.CallAfter(show_result_dialog, exception, self)
             else:
-                if cgats.queryv1("INSTRUMENT_TYPE_SPECTRAL") == "YES":
+                if cgats.queryv1("INSTRUMENT_TYPE_SPECTRAL") == b"YES":
                     setcfg("last_reference_ti3_path", cgats.filename)
                 else:
                     setcfg("last_colorimeter_ti3_path", cgats.filename)
@@ -13218,12 +13218,12 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
                         display = (
                             meta.get("EDID_model", meta.get("EDID_model_id", {}))
                             .get("value", "")
-                            .encode("UTF-7")
+                            .encode("utf-7")
                         )
                         manufacturer = (
                             meta.get("EDID_manufacturer", {})
                             .get("value", "")
-                            .encode("UTF-7")
+                            .encode("utf-7")
                         )
                         cgats.ARGYLL_COLPROF_ARGS.add_data(
                             '-M "%s" -A "%s"' % (display, manufacturer)
@@ -13505,26 +13505,23 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
                 flag=wx.ALL | wx.ALIGN_LEFT | wx.EXPAND,
                 border=4,
             )
-            use_display_txt_ctrl = not display
-            if use_display_txt_ctrl:
-                boxsizer = wx.StaticBoxSizer(
-                    wx.StaticBox(dlg, -1, lang.getstr("display")), wx.VERTICAL
-                )
-                dlg.sizer3.Add(boxsizer, 1, flag=wx.TOP | wx.EXPAND, border=12)
-                if sys.platform not in ("darwin", "win32"):
-                    boxsizer.Add((1, 8))
-                if not config.is_virtual_display():
-                    display = self.worker.get_display_name(False, True, False)
-                dlg.display_txt_ctrl = wx.TextCtrl(dlg, -1, display, size=(400, -1))
-                boxsizer.Add(
-                    dlg.display_txt_ctrl,
-                    1,
-                    flag=wx.ALL | wx.ALIGN_LEFT | wx.EXPAND,
-                    border=4,
-                )
-            use_manufacturer_txt_ctrl = (
-                not manufacturer and not config.is_virtual_display(display)
+            boxsizer = wx.StaticBoxSizer(
+                wx.StaticBox(dlg, -1, lang.getstr("display")), wx.VERTICAL
             )
+            dlg.sizer3.Add(boxsizer, 1, flag=wx.TOP | wx.EXPAND, border=12)
+            if sys.platform not in ("darwin", "win32"):
+                boxsizer.Add((1, 8))
+            if not display:
+                # protects from an improperly formatted display name in the ref.ti3
+                display = self.worker.get_display_name(False, True, False)
+            dlg.display_txt_ctrl = wx.TextCtrl(dlg, -1, display, size=(400, -1))
+            boxsizer.Add(
+                dlg.display_txt_ctrl,
+                1,
+                flag=wx.ALL | wx.ALIGN_LEFT | wx.EXPAND,
+                border=4,
+            )
+            use_manufacturer_txt_ctrl = not manufacturer
             if use_manufacturer_txt_ctrl:
                 boxsizer = wx.StaticBoxSizer(
                     wx.StaticBox(dlg, -1, lang.getstr("display.manufacturer")),
@@ -13536,17 +13533,12 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
                 if not pnpidcache:
                     # Populate pnpidcache
                     get_manufacturer_name("???")
-                # CB_SORT isn't supported by wxOSX/Cocoa!
-                # Why isn't this mentioned in the wxPython docs?
-                dlg.manufacturer_txt_ctrl = AutocompleteComboBox(
+                dlg.manufacturer_txt_ctrl = wx.Choice(
                     dlg, -1, choices=natsort(list(pnpidcache.values())), size=(400, -1)
                 )
-                if not manufacturer and display == self.worker.get_display_name(
-                    False, True, False
-                ):
-                    dlg.manufacturer_txt_ctrl.SetStringSelection(
-                        self.worker.get_display_edid().get("manufacturer", "")
-                    )
+                manufacturer_selection = self.worker.get_display_edid().get("manufacturer", "")
+                if len(manufacturer_selection) < 1: manufacturer_selection = "Unknown"
+                dlg.manufacturer_txt_ctrl.SetStringSelection(manufacturer_selection)
                 boxsizer.Add(
                     dlg.manufacturer_txt_ctrl,
                     1,
@@ -13587,8 +13579,7 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
             dlg.Center()
             result = dlg.ShowWindowModalBlocking()
             description = safe_str(dlg.description_txt_ctrl.GetValue().strip(), "UTF-8")
-            if use_display_txt_ctrl:
-                display = dlg.display_txt_ctrl.GetValue()
+            display = dlg.display_txt_ctrl.GetValue()
             if (
                 dlg.display_tech_ctrl.IsEnabled()
                 and dlg.display_tech_ctrl.GetStringSelection()
@@ -13835,7 +13826,7 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
                     b'\nOBSERVER "%s"\\1' % observer.replace(b"\\", b"\\\\"),
                     cgats,
                 )
-            if reference_observer.encode("utf-8") and not re.search(
+            if reference_observer and not re.search(
                 rb'\nREFERENCE_OBSERVER\s+".+?"\n', cgats
             ):
                 # By default, CCMX/CCSS files don't contain observer
@@ -15005,15 +14996,6 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
             if debug:
                 print("[D] display_ctrl_handler -> lut_viewer_load_lut END")
         self.update_use_video_lut()
-        # Special case: Resolve. Needs a minimum display update delay of
-        # atleast 600 ms for repeatable measurements. This is a Resolve
-        # issue. There seem to be quite a few bugs that were introduced in
-        # Resolve via the version 10.1.x to 11.x transition.
-        is_resolve = config.get_display_name() == "Resolve"
-        update_delay_ctrls = setcfg_cond(
-            is_resolve, "measure.min_display_update_delay_ms", 1000
-        )
-        setcfg_cond(is_resolve, "measure.override_min_display_update_delay_ms", 1)
         # Enable 3D LUT tab for virtual displays & eeColor
         enable_3dlut_tab = (
             config.is_virtual_display() or config.get_display_name() == "SII REPEATER"
@@ -15021,10 +15003,6 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
         setcfg_cond(
             enable_3dlut_tab, "3dlut.tab.enable", 1, True, not getcfg("3dlut.create")
         )
-        if update_delay_ctrls:
-            override = bool(getcfg("measure.override_min_display_update_delay_ms"))
-            getattr(self, "override_min_display_update_delay_ms").SetValue(override)
-            self.update_display_delay_ctrl("min_display_update_delay_ms", override)
         self.update_drift_compensation_ctrls()
         self.show_display_delay_ctrls()
         self.show_ffp_ctrls()

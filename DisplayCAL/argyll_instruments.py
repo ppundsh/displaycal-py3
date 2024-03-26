@@ -191,6 +191,17 @@ instruments = {
         "integration_time": [9.2, 3.9],  # Using i1 Pro values
         "refresh": True,
     },
+    "i1 Pro 3": {
+        "usb_ids": [{"vid": 0x0765, "pid": 0x6009, "hid": False}],
+        "spectral": True,
+        "adaptive_mode": True,
+        "highres_mode": True,
+        "projector_mode": False,
+        "sensor_cal": True,
+        "skip_sensor_cal": True,
+        "integration_time": [9.2, 3.9],  # Still just using i1 Pro values
+        "refresh": True,
+    },
     "ColorHug": {
         "usb_ids": [
             {"vid": 0x04D8, "pid": 0xF8DA, "hid": True},
