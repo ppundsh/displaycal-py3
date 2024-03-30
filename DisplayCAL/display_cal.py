@@ -18930,6 +18930,10 @@ class MainFrame(ReportFrame, BaseFrame, LUT3DMixin):
             readme = get_data_path("README-fr.html")
         else:
             readme = None
+        if lang.getcode() == "zh":
+            readme = get_data_path("README-zh_tw.html")
+        else:
+            readme = None
         if not readme:
             readme = get_data_path("README.html")
         if readme:

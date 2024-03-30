@@ -113,6 +113,7 @@ config = {
         "LICENSE.txt",
         "README.html",
         "README-fr.html",
+        "README-zh_tw.html",
         "screenshots/*.png",
         "theme/*.png",
         "theme/*.css",
@@ -256,6 +257,7 @@ def create_app_symlinks(dist_dir, scripts):
         ("CHANGES.html", "CHANGES.html"),
         ("README.html", "README.html"),
         ("README-fr.html", "README-fr.html"),
+        ("README-zh_tw.html", "README-zh_tw.html"),
         ("LICENSE.txt", "LICENSE.txt"),
     ]:
         tgt = os.path.join(dist_dir, tgt)
@@ -1441,6 +1443,7 @@ setup(ext_modules=[Extension("{name}.lib{bits}.RealDisplaySizeMM", sources={sour
                     "LICENSE.txt",
                     "README.html",
                     "README-fr.html",
+                    "README-zh_tw.html",
                     "beep.wav",
                     "cacert.pem",
                     "camera_shutter.wav",
@@ -1468,6 +1471,7 @@ setup(ext_modules=[Extension("{name}.lib{bits}.RealDisplaySizeMM", sources={sour
                     "LICENSE.txt",
                     "README.html",
                     "README-fr.html",
+                    "README-zh_tw.html",
                 ]:
                     path = os.path.join(doc, fname)
                     if path not in paths:
@@ -1554,6 +1558,7 @@ setup(ext_modules=[Extension("{name}.lib{bits}.RealDisplaySizeMM", sources={sour
                 "include MANIFEST.in",
                 "include README.html",
                 "include README-fr.html",
+                "include README-zh_tw.html",
                 "include CHANGES.html",
                 f"include {name}*.pyw",
                 f"include {name}-*.pyw",

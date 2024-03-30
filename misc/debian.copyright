@@ -40,6 +40,10 @@ Files: ${APPNAME}/lang/zh_hk.yaml
 Copyright: 2016-${YEAR}, 楊添明
 License: GPL-3+
 
+Files: ${APPNAME}/lang/zh_tw.yaml
+Copyright: 2024-${YEAR}, ppundsh
+License: GPL-3+
+
 Files: ${APPNAME}/lib/agw/*
 Copyright: 2006-${YEAR}, Andrea Gavana <andrea.gavana@gmail.com>
 License: wxWindows

@@ -243,6 +243,7 @@ f.close()"
 %doc LICENSE.txt
 %doc README.html
 %doc README-fr.html
+%doc README-zh_tw.html
 %doc screenshots
 %doc theme
 /usr/share/man/man1/*
