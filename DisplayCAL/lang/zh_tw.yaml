@@ -15,7 +15,7 @@
 "3dlut.bitdepth.output": |-
   3D 尋找表輸出色彩深度
 "3dlut.confirm_relcol_rendering_intent": |-
-  你是否想 3D 尋找表使用測量到的白點數值(3D 尋找表的渲染目的將設定為相對色度)？
+  你是否想 3D 尋找表使用測量到的白點數值(3D 尋找表的渲染目的將設定為相對色覺性)？
 "3dlut.content.colorspace": |-
   內容色域
 "3dlut.create": |-
@@ -89,7 +89,7 @@
 "3dlut.holder.out_of_memory": |-
   %s 的 3D 尋找表儲存空間不足 (最少需要 %i KB)。 請刪除一些 %s 3D 尋找表以釋放空間給新的 3D 尋找表使用。 詳情請參閱 %s 的說明書。
 "3dlut.input.colorspace": |-
-  原始色域
+  原始(檔案)色域
 "3dlut.input.profile": |-
   原始描述檔
 "3dlut.install": |-
@@ -242,7 +242,7 @@
 "argyll.instrument.drivers.install": |-
   安裝 ArgyllCMS 測量儀器驅動程式...
 "argyll.instrument.drivers.install.confirm": |-
-  你只需要在使用並非 ColorMunki Display, i1 Display Pro, Huey, ColorHug, specbos, spectraval 或 K-10 的測量儀器時，才需要安裝 ArgyllCMS 特定的驅動程式。注意: 如果你已經安裝廠商提供驅動程式，在安裝完成後，你需要在 Windows 的裝置管理員中自行切換成 ArgyllCMS 驅動程式。要這樣做的話，右按你的測量儀器然後選擇 “更新驅動程式...”，然後選擇 “瀏覽電腦上的驅動程式軟體”，之後選擇 “讓我從電腦上的裝置驅動程式清單中挑選”，最後在清單中選擇 Argyll 驅動程式。
+  你只需要在使用非 ColorMunki Display, i1 Display Pro, Huey, ColorHug, specbos, spectraval 或 K-10 等的測量儀器時，才需要安裝 ArgyllCMS 特定的驅動程式。注意: 如果你已經安裝廠商提供驅動程式，在安裝完成後，你需要在 Windows 的裝置管理員中自行切換成 ArgyllCMS 驅動程式。要這樣做的話，於裝置管理員右鍵按你的測量儀器然後選擇 “更新驅動程式...”，然後選擇 “瀏覽電腦上的驅動程式軟體”，之後選擇 “讓我從電腦上的裝置驅動程式清單中挑選”，最後在清單中選擇 Argyll 驅動程式。
   
   你還想繼續嗎？
 "argyll.instrument.drivers.install.failure": |-
@@ -396,11 +396,11 @@
 "calibration.interactive_display_adjustment.stop": |-
   停止測量
 "calibration.interactive_display_adjustment.white_level.crt": |-
-  按一下 “開始測量” 然後調校螢幕的對比度設定及/或 RGB調節控制以符合期望的數值。
+  按一下 “開始測量” 然後調整螢幕的對比度設定及/或 RGB調節控制以符合期望的數值。
 "calibration.interactive_display_adjustment.white_level.lcd": |-
-  按一下 “開始測量” 然後調校螢幕的背光燈/亮度控制以符合期望的亮度。
+  按一下 “開始測量” 然後調整螢幕的背光燈/亮度控制以符合期望的亮度。
 "calibration.interactive_display_adjustment.white_point": |-
-  按一下 “開始測量” 然後調校螢幕的色溫及/或 RGB 調節控制以符合期望的白點數值。
+  按一下 “開始測量” 然後調整螢幕的色溫及/或 RGB 調節控制以符合期望的白點數值。
 "calibration.load": |-
   載入設定...
 "calibration.load.handled_by_os": |-
@@ -646,7 +646,7 @@
 "colorimeter_correction.create.failure": |-
   修正建立失敗。
 "colorimeter_correction.create.info": |-
-  如需建立色度計修正，你必須先使用光譜儀量度必需的顏色，或假設你需要同樣地用色度計建立一個修正矩陣而並光譜修正。
+  如需建立色度計修正，你必須先使用分光計量度必需的顏色，或假設你需要同樣地用色度計建立一個修正矩陣而並光譜修正。
   另外你還可以按下 “瀏覽...” 來選擇已有的測量值。.
 "colorimeter_correction.create.success": |-
   已成功建立修正檔。
@@ -1024,11 +1024,11 @@
 "drift_compensation.blacklevel": |-
   黑色亮度漂移補償
 "drift_compensation.blacklevel.info": |-
-  黑色亮度漂移補償會試圖降低在測量裝置正在預熱時出現的校正黑色校正偏漂移現像而引致的測量值出現偏差所帶來影響。 由於此功能會反復地測量黑色色塊，會整體增加測量所需的時間。很多色度計都有內置溫度補償功能，因此很多時候都不需要使用黑色亮度漂移補償，但大部份光譜儀卻沒有溫度補償的設計。
+  黑色亮度漂移補償會試圖降低顯示裝置在螢幕預熱時出現的黑色校正偏漂移現像而引致的測量值出現偏差所帶來影響。 由於此功能會反復地測量黑色色塊，會增加整體測量所需的時間。很多色度計都有內置溫度補償功能，因此大多時候都不需要使用黑色亮度漂移補償，但大部份分光計卻沒有溫度補償的設計。
 "drift_compensation.whitelevel": |-
   白色亮度漂移補償
 "drift_compensation.whitelevel.info": |-
-  白色亮度漂移補償會試圖降低在顯示裝置正在預熱時所出現的亮度變化而引致測量值出現偏差所帶來的影響。由於此功能會反復地測量白色色塊，會整體增加測量所需的時間。
+  白色亮度漂移補償會試圖降低顯示裝置在預熱時所出現的亮度變化而引致測量值出現偏差所帶來的影響。由於此功能會反復地測量白色色塊，會增加整體測量所需的時間。
 "dry_run": |-
   空轉運行
 "dry_run.end": |-
@@ -1263,9 +1263,9 @@
 "gamap.intents.aw": |-
   絕對色覺性 (Absolute colorimetric) 並縮放白點
 "gamap.intents.la": |-
-  符合 Perceptual appearance 的亮度
+  亮度匹配觀感 (Luminance matched appearance)
 "gamap.intents.lp": |-
-  保留 Perceptual appearance 的亮度
+  保持亮度的知覺性觀感 (Luminance preserving perceptual appearance)
 "gamap.intents.ms": |-
   保留飽和度 (Preserve saturation)
 "gamap.intents.p": |-
@@ -1414,7 +1414,7 @@
   固定部分（與動態連結的 ICC 裝置組態檔案不同）。 例如，高畫質視訊素材通常會根據 Rec. 709 標準進行母帶
   製作，pure power gamma 約為 2.2-2.4（相對黑色輸出偏移 100%）或 Rec. 1886 色調響應曲線（絕對黑色輸出偏移
   為 0% ）。
-  透過將黑色輸出偏移設定為 0% 到 100% 之間的值，也可以在 Rec. 1886 和 pure power 之間進行分割
+  透過將黑色輸出偏移設定為 0% 到 100% 之間的任何值，也可以實現 Rec. 1886 和 pure power 之間的分割。
   
   <font weight='bold'>“絕對”伽瑪 vs “相對”伽瑪</font>
   為了符合真實螢幕的非零黑色亮度，需要相應地偏移和縮放色調響應曲線。
@@ -1439,7 +1439,7 @@
   
   如果你的螢幕為 <font weight='bold'>OLED</font>、<font weight='bold'>等離子</font>螢幕或擁有因應畫面內容而改變亮度的技術，請啟用<font weight='bold'>白色亮度漂移補償</font>.
   
-  如果你的測量儀器為<font weight='bold'>光譜儀</font>並於接觸模式下用於黑階穩定的螢幕， 您可能需要啟用<font weight='bold'>測量儀器黑位偏移補償</font>。
+  如果你的測量儀器為<font weight='bold'>分光計</font>並於接觸模式下用於檢測黑階穩定的螢幕，您可能需要啟用<font weight='bold'>測量儀器黑位偏移補償</font>。
   
   如果你的測量儀器為<font weight='bold'>色度計</font>，你應該使用適用於你的螢幕或螢幕技術類型的<font weight='bold'>修正</font>。 請留意有些測量儀器 (ColorHug,
   ColorHug2, K-10, Spyder4/5/X) 它們的測量模式可能已經內置相關的修正。
@@ -1510,7 +1510,7 @@
 "instrument.calibrate": |-
   將不透光的蓋子放在儀器上（如果適用），或放在黑暗的無光澤表面上，或其校準參考上（如果適用），然後按“確定”以自校準儀器。
 "instrument.calibrate.colormunki": |-
-  設定 ColorMunki 感度器到校正位置然後按"確認"以校正測量儀器。
+  設定 ColorMunki 感測器到校正位置然後按"確認"以校正測量儀器。
 "instrument.calibrate.reflective": |-
   將儀器放置在它的序號 %s 反光白色參考表面上然後按"確認"以校正儀器。
 "instrument.calibrate.spyderx": |-
@@ -1957,7 +1957,7 @@
   %y	年份不包含年代
   %Y	年份包含年代
 "profile.no_embedded_ti3": |-
-  該描述檔不包含 Argyll 兼容的測量資料。
+  該描述檔不包含 Argyll 相容的測量資料。
 "profile.no_vcgt": |-
   該描述檔不包含校正曲線。
 "profile.only_named_color": |-
