@@ -89,7 +89,7 @@
 "3dlut.holder.out_of_memory": |-
   %s 的 3D 尋找表儲存空間不足 (最少需要 %i KB)。 請刪除一些 %s 3D 尋找表以釋放空間給新的 3D 尋找表使用。 詳情請參閱 %s 的說明書。
 "3dlut.input.colorspace": |-
-  原始色域
+  原始(檔案)色域
 "3dlut.input.profile": |-
   原始描述檔
 "3dlut.install": |-
@@ -1263,9 +1263,9 @@
 "gamap.intents.aw": |-
   絕對色覺性 (Absolute colorimetric) 並縮放白點
 "gamap.intents.la": |-
-  符合 Perceptual appearance 的亮度
+  亮度匹配觀感 (Luminance matched appearance)
 "gamap.intents.lp": |-
-  保留 Perceptual appearance 的亮度
+  保持亮度的知覺性觀感 (Luminance preserving perceptual appearance)
 "gamap.intents.ms": |-
   保留飽和度 (Preserve saturation)
 "gamap.intents.p": |-
