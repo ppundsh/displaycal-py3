@@ -17,7 +17,7 @@
 "3dlut.confirm_relcol_rendering_intent": |-
   你是否想 3D 尋找表使用測量到的白點數值(3D 尋找表的渲染目的將設定為相對色覺性)？
 "3dlut.content.colorspace": |-
-  內容色域
+  色彩空間內容
 "3dlut.create": |-
   建立 3D 尋找表...
 "3dlut.create_after_profiling": |-
@@ -39,7 +39,7 @@
 "3dlut.encoding.type_7": |-
   TV Rec. 709 1125/60Hz YCbCr HD
 "3dlut.encoding.type_C": |-
-  TV Rec. 2020 恆定亮度 YCbCr UHD
+  TV Rec. 2020 恆定明度 YCbCr UHD
 "3dlut.encoding.type_T": |-
   TV RGB 16-235 (剪裁 WTW)
 "3dlut.encoding.type_X": |-
@@ -89,9 +89,9 @@
 "3dlut.holder.out_of_memory": |-
   %s 的 3D 尋找表儲存空間不足 (最少需要 %i KB)。 請刪除一些 %s 3D 尋找表以釋放空間給新的 3D 尋找表使用。 詳情請參閱 %s 的說明書。
 "3dlut.input.colorspace": |-
-  原始(檔案)色域
+  來源色彩空間
 "3dlut.input.profile": |-
-  原始描述檔
+  來源描述檔
 "3dlut.install": |-
   安裝 3D 尋找表
 "3dlut.install.failure": |-
@@ -149,7 +149,7 @@
 "Untethered": |-
   非連接式
 "[rgb]TRC": |-
-  色調響應曲線
+  色調響應曲線(Tone response curves)
 "aborted": |-
   ...已中止.
 "aborting": |-
@@ -292,7 +292,7 @@
 "black_point_compensation": |-
   黑位補償
 "black_point_compensation.3dlut.warning": |-
-  當建立 3D 尋找表時，應該先關閉分析設定中的黑位補償功能，因為會影響色調曲線調整的功能。你是否想關閉黑位補償？
+  當建立 3D 尋找表時，應該先關閉分析設定中的黑位補償功能，因為會影響色調響應曲線調整的功能。你是否想關閉黑位補償？
 "black_point_compensation.info": |-
   黑位補償能有效防止黑位被壓縮，但會降低色彩轉換的精確度。
 "black_white": |-
@@ -699,7 +699,7 @@
 "colors_pcs_relative": |-
   色彩 (PCS - 相對)
 "colorspace": |-
-  色域
+  色彩空間
 "colorspace.show_outline": |-
   顯示摘要
 "commandline": |-
@@ -1107,9 +1107,9 @@
   錯誤碼：%s
   錯誤訊息：%s
 "error.luminance.invalid": |-
-  測量到的最高亮度為無效的。請確保儀器上的感應器沒有被阻擋，並移除任何保護蓋 (如有)。
+  測量到無效的最高亮度。請確保儀器上的感應器沒有被阻擋，並移除任何保護蓋 (如有)。
 "error.luminance.not_monotonically_increasing": |-
-  測量到的亮度回應高度非單一（設備或儀器故障）。 無法產生色調響應曲線。
+  測量到的高度非單一的亮度回應（設備或儀器故障）。 無法產生色調響應曲線。
 "error.malformed_cgats": |-
   %s 檔案“%s”格式錯誤。
 "error.measurement.file_invalid": |-
@@ -1263,11 +1263,11 @@
 "gamap.intents.aw": |-
   絕對色覺性 (Absolute colorimetric) 並縮放白點
 "gamap.intents.la": |-
-  亮度匹配觀感 (Luminance matched appearance)
+  明度匹配觀感 (Luminance matched appearance)
 "gamap.intents.lp": |-
-  保持亮度的知覺性觀感 (Luminance preserving perceptual appearance)
+  恆定明度的知覺性觀感 (Luminance preserving perceptual appearance)
 "gamap.intents.ms": |-
-  保留飽和度 (Preserve saturation)
+  恆定飽和度 (Preserve saturation)
 "gamap.intents.p": |-
   知覺性 (Perceptual)
 "gamap.intents.pa": |-
@@ -1281,7 +1281,7 @@
 "gamap.perceptual": |-
   用於知覺性的色域對應方式
 "gamap.profile": |-
-  原始描述檔
+  來源色彩空間
 "gamap.saturation": |-
   用於飽和度目的的色域對應方式
 "gamap.src_viewcond": |-
@@ -1291,7 +1291,7 @@
 "gamap.viewconds.jd": |-
   投影機於黑暗的環境
 "gamap.viewconds.jm": |-
-  投影機於陰暗的環境
+  投影機於陰暗的環境F
 "gamap.viewconds.mb": |-
   螢幕於明亮的工作環境
 "gamap.viewconds.md": |-
@@ -1595,10 +1595,10 @@
   製造商和型號
 "manufacturer": |-
   製造商
-"*mastering_display_black_luminance": |-
-  Mastering display black level
-"*mastering_display_peak_luminance": |-
-  Mastering display peak luminance
+"mastering_display_black_luminance": |-
+  Mastering 螢幕黑色亮度
+"mastering_display_peak_luminance": |-
+  Mastering 螢幕峰值亮度
 "matrix": |-
   矩陣
 "matte": |-
@@ -1879,7 +1879,7 @@
 "preserve_hue": |-
   保持色調
 "preserve_luminance": |-
-  保持亮度
+  保持明度
 "preserve_saturation": |-
   保持飽和度
 "preset": |-
@@ -1992,37 +1992,37 @@
   您可以透過 OpenSUSE「ICC Profile Taxi」服務與其他使用者分享您的個人資料。
   
   請提供有意義的描述並在下面輸入顯示設備屬性。 從顯示裝置的 OSD 讀取顯示裝置設置，並僅輸入適用於您的顯示裝置且已從預設值變更的設定。
-  範例：對於大多數顯示設備，這些是所選預設、亮度、對比度、色溫和/或白點 RGB 增益以及伽馬的名稱。 在筆記型電腦上，通常只有亮度。 如果您在校準顯示設備時更改了其他設置，請盡可能輸入它們。
+  範例：對於大多數顯示設備，這些是預設、亮度、對比度、色溫和/或白點 RGB 增益以及伽馬的名稱。 在筆記型電腦上，通常只有亮度。 如果您在校準顯示設備時更改了其他設置，請盡可能輸入它們。
 "profile.share.meta_missing": |-
   該描述檔不包含必需的數據描述資訊。
 "profile.share.success": |-
   描述檔已成功上傳。
-"*profile.tags.A2B0.shaper_curves.input": |-
-  A2B0 input shaper curves
-"*profile.tags.A2B0.shaper_curves.output": |-
-  A2B0 output shaper curves
-"*profile.tags.A2B1.shaper_curves.input": |-
-  A2B1 input shaper curves
-"*profile.tags.A2B1.shaper_curves.output": |-
-  A2B1 output shaper curves
-"*profile.tags.A2B2.shaper_curves.input": |-
-  A2B2 input shaper curves
-"*profile.tags.A2B2.shaper_curves.output": |-
-  A2B2 output shaper curves
-"*profile.tags.B2A0.shaper_curves.input": |-
-  B2A0 input shaper curves
-"*profile.tags.B2A0.shaper_curves.output": |-
-  B2A0 output shaper curves
-"*profile.tags.B2A1.shaper_curves.input": |-
-  B2A1 input shaper curves
-"*profile.tags.B2A1.shaper_curves.output": |-
-  B2A1 output shaper curves
-"*profile.tags.B2A2.shaper_curves.input": |-
-  B2A2 input shaper curves
-"*profile.tags.B2A2.shaper_curves.output": |-
-  B2A2 output shaper curves
+"profile.tags.A2B0.shaper_curves.input": |-
+  裝置到PCS 0 (A2B0)輸入成形曲線
+"profile.tags.A2B0.shaper_curves.output": |-
+  裝置到PCS 0 (A2B0)輸出成形曲線
+"profile.tags.A2B1.shaper_curves.input": |-
+  裝置到PCS 1 (A2B1)輸入成形曲線
+"profile.tags.A2B1.shaper_curves.output": |-
+  裝置到PCS 1 (A2B1)輸出成形曲線
+"profile.tags.A2B2.shaper_curves.input": |-
+  裝置到PCS 2 (A2B2)輸入成形曲線
+"profile.tags.A2B2.shaper_curves.output": |-
+  裝置到PCS 2 (A2B2)輸出成形曲線
+"profile.tags.B2A0.shaper_curves.input": |-
+  PCS到裝置 0 (B2A0)輸入成形曲線
+"profile.tags.B2A0.shaper_curves.output": |-
+  PCS到裝置 0 (B2A0)輸出成形曲線
+"profile.tags.B2A1.shaper_curves.input": |-
+  PCS到裝置 1 (B2A1)輸入成形曲線
+"profile.tags.B2A1.shaper_curves.output": |-
+  PCS到裝置 1 (B2A1)輸出成形曲線
+"profile.tags.B2A2.shaper_curves.input": |-
+  PCS到裝置 2 (B2A2)輸入成形曲線
+"profile.tags.B2A2.shaper_curves.output": |-
+  PCS到裝置 2 (B2A2)輸出成形曲線
 "profile.testchart_recommendation": |-
-  如果想得到較高品質的描述檔，就建議使用較多樣本數量的測色板，但需要較長的時間來進行測量。 你是否想使用建議的測色板？
+  如果想得到較高品質的描述檔，建議使用較多樣本數量的測色板，但需要較長的時間來進行測量。 你是否想使用建議的測色板？
 "profile.type": |-
   描述檔類型
 "profile.type.gamma_matrix": |-
@@ -2414,7 +2414,7 @@
 "tray_icon_animation": |-
   動畫化通知區域圖示
 "trc": |-
-  色調曲線
+  色調響應曲線
 "*trc.dicom": |-
   DICOM
 "trc.gamma": |-
@@ -2488,7 +2488,7 @@
 "use_simulation_profile_as_output": |-
   將"模擬描述檔"視為"目標描述檔"(螢幕設定集)使用
 "vcgt": |-
-  校正曲線
+  校正曲線(vcgt)
 "vcgt.mismatch": |-
   用於螢幕 %s 的顯示卡伽瑪表並不符合期望的狀態。
 "vcgt.unknown_format": |-
@@ -2585,8 +2585,8 @@
   符合以下一個或所有條件：
   
   • 具有不同 RGB 數字的連續色塊，但彼此測量的 ΔE*00 值低得可疑。
-  • RGB 灰色，隨著前一個補丁的 RGB 數量增加，但亮度下降 (L*)。
-  • RGB 灰色，隨著前一個補丁的 RGB 數量減少，但亮度增加 (L*)。
+  • RGB 灰色，隨著前一個補丁的 RGB 數量增加，但明度下降 (L*)。
+  • RGB 灰色，隨著前一個補丁的 RGB 數量減少，但明度增加 (L*)。
   • 相對於 RGB 數字的 sRGB 等值，測量值的 ΔE*00 和 ΔL*00 或 ΔH*00 或 ΔC*00 異常高。
   
   這可能暗示測量錯誤。 被認為有問題的值（不一定是真的！）以紅色突出顯示。 檢查測量結果並標記您想要接受的範圍。 您也可以編輯 RGB 和 XYZ 值。
